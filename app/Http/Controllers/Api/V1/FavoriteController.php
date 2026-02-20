@@ -18,7 +18,7 @@ class FavoriteController extends Controller
         $favorites = $request->user()
             ->favorites()
             ->active()
-            ->with(['city', 'categories'])
+            ->with(['city', 'categories', 'services'])
             ->latest('favorites.created_at')
             ->paginate($request->input('per_page', 15));
 

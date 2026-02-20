@@ -41,7 +41,7 @@ class CategoryController extends Controller
 
         $vendors = Vendor::active()
             ->inCategory($categoryModel->id)
-            ->with(['city', 'categories']);
+            ->with(['city', 'categories', 'services']);
 
         if ($request->filled('city_id')) {
             $vendors->inCity($request->city_id);

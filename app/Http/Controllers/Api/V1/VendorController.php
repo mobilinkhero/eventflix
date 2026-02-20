@@ -119,7 +119,7 @@ class VendorController extends Controller
         $query = Vendor::query()
             ->active()
             ->featured()
-            ->with(['city', 'categories']);
+            ->with(['city', 'categories', 'services']);
 
         if ($request->filled('city_id')) {
             $query->inCity($request->city_id);
@@ -143,7 +143,7 @@ class VendorController extends Controller
     {
         $query = Vendor::query()
             ->active()
-            ->with(['city', 'categories']);
+            ->with(['city', 'categories', 'services']);
 
         if ($request->filled('city_id')) {
             $query->inCity($request->city_id);

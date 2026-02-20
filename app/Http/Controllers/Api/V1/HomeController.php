@@ -44,13 +44,13 @@ class HomeController extends Controller
             ->get();
 
         // Featured vendors
-        $featuredQuery = Vendor::active()->featured()->with(['city', 'categories']);
+        $featuredQuery = Vendor::active()->featured()->with(['city', 'categories', 'services']);
         if ($cityId)
             $featuredQuery->inCity($cityId);
         $featured = $featuredQuery->orderByDesc('rating')->limit(10)->get();
 
         // Popular vendors
-        $popularQuery = Vendor::active()->with(['city', 'categories']);
+        $popularQuery = Vendor::active()->with(['city', 'categories', 'services']);
         if ($cityId)
             $popularQuery->inCity($cityId);
         $popular = $popularQuery->orderByDesc('total_bookings')
@@ -59,7 +59,7 @@ class HomeController extends Controller
             ->get();
 
         // New vendors
-        $newQuery = Vendor::active()->with(['city', 'categories']);
+        $newQuery = Vendor::active()->with(['city', 'categories', 'services']);
         if ($cityId)
             $newQuery->inCity($cityId);
         $newVendors = $newQuery->latest()->limit(10)->get();
@@ -97,7 +97,7 @@ class HomeController extends Controller
 
         $vendors = Vendor::active()
             ->search($query)
-            ->with(['city', 'categories'])
+            ->with(['city', 'categories', 'services'])
             ->orderByDesc('is_featured')
             ->orderByDesc('rating')
             ->paginate($request->input('per_page', 15));
