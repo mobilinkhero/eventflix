@@ -1,11 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\VendorController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\CityController;
 use App\Http\Controllers\Web\PageController;
+
+// Serve storage files directly (shared hosting fix - no symlink needed)
+Route::get('/storage/{path}', function (string $path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+    $mime = mime_content_type($fullPath);
+    return response()->file($fullPath, ['Content-Type' => $mime]);
+})->where('path', '.*')->name('storage.serve');
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
