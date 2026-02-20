@@ -2,56 +2,59 @@
 @section('title', 'Cities')
 
 @section('content')
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-        <p style="color:var(--t2);font-size:.84rem">Manage cities for vendor locations</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+        <span style="font-size:.72rem;color:var(--t3)">{{ $cities->total() }} cities</span>
         <a href="{{ route('admin.cities.create') }}" class="btn btn-pri"><span class="mi material-icons-round">add</span>
-            Add City</a>
+            New City</a>
     </div>
 
-    <div class="tbl-wrap">
+    <div class="panel">
         <table class="tbl">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>City</th>
                     <th>Province</th>
                     <th>Slug</th>
                     <th>Vendors</th>
-                    <th>Active</th>
+                    <th>Status</th>
                     <th>Order</th>
-                    <th>Actions</th>
+                    <th style="text-align:right">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($cities as $city)
                     <tr>
-                        <td><strong>{{ $city->name }}</strong></td>
-                        <td>{{ $city->province ?? '—' }}</td>
-                        <td style="color:var(--t3);font-size:.78rem">{{ $city->slug }}</td>
-                        <td><span class="badge badge-gray">{{ $city->vendors_count }}</span></td>
+                        <td class="name">{{ $city->name }}</td>
+                        <td style="color:var(--t2)">{{ $city->province ?? '—' }}</td>
+                        <td class="mono">{{ $city->slug }}</td>
+                        <td><span class="b b-gray">{{ $city->vendors_count }}</span></td>
                         <td>
-                            @if($city->is_active)
-                                <span class="badge badge-green">Active</span>
-                            @else
-                                <span class="badge badge-red">Inactive</span>
-                            @endif
+                            <span class="b-dot {{ $city->is_active ? 'on' : 'off' }}"></span>
+                            <span style="font-size:.65rem;color:var(--t3)">{{ $city->is_active ? 'Active' : 'Off' }}</span>
                         </td>
-                        <td style="color:var(--t3)">{{ $city->sort_order ?? '—' }}</td>
+                        <td class="mono">{{ $city->sort_order ?? 0 }}</td>
                         <td>
-                            <div style="display:flex;gap:.35rem">
-                                <a href="{{ route('admin.cities.edit', $city) }}" class="btn btn-out btn-sm"><span
+                            <div class="act-group" style="justify-content:flex-end">
+                                <a href="{{ route('admin.cities.edit', $city) }}" class="btn btn-ghost btn-xs"><span
                                         class="mi material-icons-round">edit</span></a>
                                 <form method="POST" action="{{ route('admin.cities.destroy', $city) }}"
-                                    onsubmit="return confirm('Delete this city?')">
+                                    onsubmit="return confirm('Delete?')" style="display:inline">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-red btn-sm"><span
-                                            class="mi material-icons-round">delete</span></button>
+                                    <button class="btn btn-ghost btn-xs" style="color:var(--red)"><span
+                                            class="mi material-icons-round">delete_outline</span></button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align:center;padding:2rem;color:var(--t3)">No cities yet</td>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <span class="mi material-icons-round">apartment</span>
+                                <h3>No cities</h3>
+                                <p>Add your first city</p>
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
@@ -59,7 +62,8 @@
 
         @if($cities->hasPages())
             <div class="pag">
-                {{ $cities->links() }}
+                <span>{{ $cities->firstItem() }}–{{ $cities->lastItem() }} of {{ $cities->total() }}</span>
+                <div class="pag-btns">{{ $cities->links() }}</div>
             </div>
         @endif
     </div>

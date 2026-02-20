@@ -2,23 +2,23 @@
 @section('title', 'Categories')
 
 @section('content')
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-        <p style="color:var(--t2);font-size:.84rem">Manage event categories</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+        <span style="font-size:.72rem;color:var(--t3)">{{ $categories->total() }} categories</span>
         <a href="{{ route('admin.categories.create') }}" class="btn btn-pri"><span
-                class="mi material-icons-round">add</span> Add Category</a>
+                class="mi material-icons-round">add</span> New Category</a>
     </div>
 
-    <div class="tbl-wrap">
+    <div class="panel">
         <table class="tbl">
             <thead>
                 <tr>
-                    <th>Icon</th>
+                    <th style="width:40px">Icon</th>
                     <th>Name</th>
                     <th>Slug</th>
                     <th>Vendors</th>
-                    <th>Active</th>
+                    <th>Status</th>
                     <th>Order</th>
-                    <th>Actions</th>
+                    <th style="text-align:right">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,38 +26,41 @@
                     <tr>
                         <td>
                             <div
-                                style="width:36px;height:36px;border-radius:8px;background:{{ $cat->color ?? '#c48b8b' }}20;display:flex;align-items:center;justify-content:center">
+                                style="width:28px;height:28px;border-radius:6px;background:{{ $cat->color ?? '#b07272' }}18;display:flex;align-items:center;justify-content:center">
                                 <span class="mi material-icons-round"
-                                    style="font-size:18px;color:{{ $cat->color ?? '#c48b8b' }}">{{ $cat->icon ?? 'category' }}</span>
+                                    style="font-size:14px;color:{{ $cat->color ?? '#b07272' }}">{{ $cat->icon ?? 'category' }}</span>
                             </div>
                         </td>
-                        <td><strong>{{ $cat->name }}</strong></td>
-                        <td style="color:var(--t3);font-size:.78rem">{{ $cat->slug }}</td>
-                        <td><span class="badge badge-gray">{{ $cat->vendors_count }}</span></td>
+                        <td class="name">{{ $cat->name }}</td>
+                        <td class="mono">{{ $cat->slug }}</td>
+                        <td><span class="b b-gray">{{ $cat->vendors_count }}</span></td>
                         <td>
-                            @if($cat->is_active)
-                                <span class="badge badge-green">Active</span>
-                            @else
-                                <span class="badge badge-red">Inactive</span>
-                            @endif
+                            <span class="b-dot {{ $cat->is_active ? 'on' : 'off' }}"></span>
+                            <span style="font-size:.65rem;color:var(--t3)">{{ $cat->is_active ? 'Active' : 'Off' }}</span>
                         </td>
-                        <td style="color:var(--t3)">{{ $cat->sort_order ?? '—' }}</td>
+                        <td class="mono">{{ $cat->sort_order ?? 0 }}</td>
                         <td>
-                            <div style="display:flex;gap:.35rem">
-                                <a href="{{ route('admin.categories.edit', $cat) }}" class="btn btn-out btn-sm"><span
+                            <div class="act-group" style="justify-content:flex-end">
+                                <a href="{{ route('admin.categories.edit', $cat) }}" class="btn btn-ghost btn-xs"><span
                                         class="mi material-icons-round">edit</span></a>
                                 <form method="POST" action="{{ route('admin.categories.destroy', $cat) }}"
-                                    onsubmit="return confirm('Delete this category?')">
+                                    onsubmit="return confirm('Delete?')" style="display:inline">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-red btn-sm"><span
-                                            class="mi material-icons-round">delete</span></button>
+                                    <button class="btn btn-ghost btn-xs" style="color:var(--red)"><span
+                                            class="mi material-icons-round">delete_outline</span></button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align:center;padding:2rem;color:var(--t3)">No categories yet</td>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <span class="mi material-icons-round">sell</span>
+                                <h3>No categories</h3>
+                                <p>Create your first category</p>
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
@@ -65,7 +68,8 @@
 
         @if($categories->hasPages())
             <div class="pag">
-                {{ $categories->links() }}
+                <span>{{ $categories->firstItem() }}–{{ $categories->lastItem() }} of {{ $categories->total() }}</span>
+                <div class="pag-btns">{{ $categories->links() }}</div>
             </div>
         @endif
     </div>

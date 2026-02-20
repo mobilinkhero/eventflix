@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login — EventsWally</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin — EventsWally</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,8 +14,8 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f4f3f1;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #1e1b1b;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -23,116 +23,148 @@
             -webkit-font-smoothing: antialiased
         }
 
-        .login-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .06);
-            border: 1px solid #eeecea
+        .wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem
         }
 
-        .login-card h1 {
-            font-size: 1.35rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            color: #fff
+        }
+
+        .logo-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #b07272, #964f4f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .8rem;
+            color: #fff
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
             font-weight: 700;
-            margin-bottom: .25rem;
-            color: #1a1a1a
-        }
-
-        .login-card p {
-            font-size: .84rem;
-            color: #6b6b6b;
-            margin-bottom: 1.75rem
-        }
-
-        .login-card .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: #2c2424;
             letter-spacing: -.3px
         }
 
-        .login-card .logo span {
-            color: #c48b8b
+        .logo-text span {
+            color: #b07272;
+            font-weight: 400
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 340px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .3)
+        }
+
+        .card h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: .15rem
+        }
+
+        .card p {
+            font-size: .72rem;
+            color: #999;
+            margin-bottom: 1.25rem
         }
 
         .fg {
-            margin-bottom: 1.1rem
+            margin-bottom: .85rem
         }
 
         .fg label {
             display: block;
-            font-size: .78rem;
+            font-size: .68rem;
             font-weight: 600;
-            margin-bottom: .35rem;
-            color: #6b6b6b
+            margin-bottom: .25rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: .5px
         }
 
         .fi {
             width: 100%;
-            padding: .7rem .9rem;
-            border: 1px solid #eeecea;
-            border-radius: 8px;
-            font-size: .86rem;
+            padding: .5rem .7rem;
+            border: 1px solid #ece9e6;
+            border-radius: 6px;
+            font-size: .82rem;
             font-family: inherit;
-            background: #fff;
-            transition: border-color .2s
+            transition: border-color .15s
         }
 
         .fi:focus {
             outline: none;
-            border-color: #c48b8b
+            border-color: #b07272;
+            box-shadow: 0 0 0 2px #f5e6e6
         }
 
         .btn {
             width: 100%;
-            padding: .75rem;
+            padding: .55rem;
             border: none;
-            border-radius: 8px;
-            font-size: .86rem;
+            border-radius: 6px;
+            font-size: .78rem;
             font-weight: 700;
-            background: #2c2424;
+            background: #1e1b1b;
             color: #fff;
             cursor: pointer;
             font-family: inherit;
-            transition: background .2s
+            transition: background .15s
         }
 
         .btn:hover {
-            background: #c48b8b
+            background: #b07272
         }
 
         .err {
-            font-size: .8rem;
-            color: #c0392b;
-            margin-bottom: 1rem;
-            padding: .5rem .75rem;
-            background: #fde3e1;
-            border-radius: 6px
+            font-size: .72rem;
+            color: #ef4444;
+            margin-bottom: .75rem;
+            padding: .4rem .6rem;
+            background: #fee2e2;
+            border-radius: 6px;
+            border: 1px solid #fecaca
         }
     </style>
 </head>
 
 <body>
-    <div class="login-card">
-        <div class="logo">Events<span>Wally</span></div>
-        <h1>Admin Panel</h1>
-        <p>Enter the admin password to continue.</p>
+    <div class="wrap">
+        <div class="logo">
+            <div class="logo-mark">EW</div>
+            <div class="logo-text">Events<span>Wally</span></div>
+        </div>
+        <div class="card">
+            <h1>Admin Panel</h1>
+            <p>Enter password to continue</p>
 
-        @if($errors->any())
-            <div class="err">{{ $errors->first() }}</div>
-        @endif
+            @if($errors->any())
+                <div class="err">{{ $errors->first() }}</div>
+            @endif
 
-        <form method="POST" action="{{ route('admin.authenticate') }}">
-            @csrf
-            <div class="fg">
-                <label>Password</label>
-                <input type="password" name="password" class="fi" placeholder="Enter admin password" autofocus required>
-            </div>
-            <button type="submit" class="btn">Sign In</button>
-        </form>
+            <form method="POST" action="{{ route('admin.authenticate') }}">
+                @csrf
+                <div class="fg">
+                    <label>Password</label>
+                    <input type="password" name="password" class="fi" placeholder="••••••••" autofocus required>
+                </div>
+                <button type="submit" class="btn">Sign In →</button>
+            </form>
+        </div>
     </div>
 </body>
 

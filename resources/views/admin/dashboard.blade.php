@@ -2,154 +2,174 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <!-- Stats -->
+    <!-- Row 1: Key Stats -->
     <div class="stats">
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#c48b8b,#ad7070)">
-                <span class="mi material-icons-round">store</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#b07272,#964f4f)">
+                <span class="mi material-icons-round">storefront</span>
             </div>
-            <h3>{{ $stats['vendors'] }}</h3>
-            <p>Total Vendors</p>
+            <div class="stat-d">
+                <h3>{{ $stats['vendors'] }}</h3>
+                <p>Total Vendors</p>
+            </div>
         </div>
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#34c759,#28a745)">
-                <span class="mi material-icons-round">check_circle</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
+                <span class="mi material-icons-round">verified</span>
             </div>
-            <h3>{{ $stats['active_vendors'] }}</h3>
-            <p>Active Vendors</p>
+            <div class="stat-d">
+                <h3>{{ $stats['active_vendors'] }}</h3>
+                <p>Active</p>
+            </div>
         </div>
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#c9a961,#ad8d45)">
-                <span class="mi material-icons-round">category</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#eab308,#ca8a04)">
+                <span class="mi material-icons-round">sell</span>
             </div>
-            <h3>{{ $stats['categories'] }}</h3>
-            <p>Categories</p>
+            <div class="stat-d">
+                <h3>{{ $stats['categories'] }}</h3>
+                <p>Categories</p>
+            </div>
         </div>
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#7a8b9a,#5c6d7e)">
-                <span class="mi material-icons-round">location_city</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
+                <span class="mi material-icons-round">apartment</span>
             </div>
-            <h3>{{ $stats['cities'] }}</h3>
-            <p>Cities</p>
+            <div class="stat-d">
+                <h3>{{ $stats['cities'] }}</h3>
+                <p>Cities</p>
+            </div>
         </div>
     </div>
 
-    <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stats">
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#b8a5d0,#9a85b8)">
-                <span class="mi material-icons-round">calendar_today</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">
+                <span class="mi material-icons-round">event_note</span>
             </div>
-            <h3>{{ $stats['bookings'] }}</h3>
-            <p>Bookings</p>
+            <div class="stat-d">
+                <h3>{{ $stats['bookings'] }}</h3>
+                <p>Bookings</p>
+            </div>
         </div>
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#ffb800,#e6a700)">
-                <span class="mi material-icons-round">star</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#f97316,#ea580c)">
+                <span class="mi material-icons-round">reviews</span>
             </div>
-            <h3>{{ $stats['reviews'] }}</h3>
-            <p>Reviews</p>
+            <div class="stat-d">
+                <h3>{{ $stats['reviews'] }}</h3>
+                <p>Reviews</p>
+            </div>
         </div>
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#5bc0de,#3eafd4)">
-                <span class="mi material-icons-round">people</span>
+            <div class="stat-ic" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">
+                <span class="mi material-icons-round">group</span>
             </div>
-            <h3>{{ $stats['users'] }}</h3>
-            <p>Users</p>
+            <div class="stat-d">
+                <h3>{{ $stats['users'] }}</h3>
+                <p>Users</p>
+            </div>
         </div>
         <div class="stat">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">
+            <div class="stat-ic" style="background:linear-gradient(135deg,#ec4899,#db2777)">
                 <span class="mi material-icons-round">workspace_premium</span>
             </div>
-            <h3>{{ $stats['featured_vendors'] }}</h3>
-            <p>Featured</p>
+            <div class="stat-d">
+                <h3>{{ $stats['featured_vendors'] }}</h3>
+                <p>Featured</p>
+            </div>
         </div>
     </div>
 
-    <!-- Recent Vendors -->
-    <div class="tbl-wrap">
-        <div class="tbl-head">
-            <h2>Recent Vendors</h2>
-            <a href="{{ route('admin.vendors.index') }}" class="btn btn-out btn-sm">View All</a>
-        </div>
-        <table class="tbl">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>City</th>
-                    <th>Status</th>
-                    <th>Featured</th>
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentVendors as $vendor)
-                    <tr>
-                        <td><strong>{{ $vendor->name }}</strong></td>
-                        <td>{{ $vendor->city->name ?? '—' }}</td>
-                        <td>
-                            @if($vendor->status === 'approved')
-                                <span class="badge badge-green">Approved</span>
-                            @elseif($vendor->status === 'pending')
-                                <span class="badge badge-yellow">Pending</span>
-                            @elseif($vendor->status === 'rejected')
-                                <span class="badge badge-red">Rejected</span>
-                            @else
-                                <span class="badge badge-gray">{{ ucfirst($vendor->status ?? 'N/A') }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($vendor->is_featured)
-                                <span class="badge badge-rose">Featured</span>
-                            @else
-                                <span class="badge badge-gray">No</span>
-                            @endif
-                        </td>
-                        <td style="color:var(--t3);font-size:.78rem">{{ $vendor->created_at?->diffForHumans() ?? '—' }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" style="text-align:center;color:var(--t3);padding:2rem">No vendors yet</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <!-- Quick Actions -->
+    <div style="display:flex;gap:.4rem;margin-bottom:1.25rem;flex-wrap:wrap">
+        <a href="{{ route('admin.vendors.create') }}" class="btn btn-pri"><span class="mi material-icons-round">add</span>
+            Add Vendor</a>
+        <a href="{{ route('admin.categories.create') }}" class="btn btn-out"><span
+                class="mi material-icons-round">add</span> Add Category</a>
+        <a href="{{ route('admin.cities.create') }}" class="btn btn-out"><span class="mi material-icons-round">add</span>
+            Add City</a>
     </div>
 
-    <!-- Recent Bookings -->
-    <div class="tbl-wrap">
-        <div class="tbl-head">
-            <h2>Recent Bookings</h2>
+    <!-- Tables Side by Side -->
+    <div class="grid-3">
+        <!-- Recent Vendors -->
+        <div class="panel">
+            <div class="panel-h">
+                <h2><span class="mi material-icons-round">storefront</span> Recent Vendors</h2>
+                <a href="{{ route('admin.vendors.index') }}" class="btn btn-ghost btn-xs">View All →</a>
+            </div>
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Status</th>
+                        <th>Flags</th>
+                        <th>Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentVendors as $v)
+                        <tr>
+                            <td>
+                                <span class="name">{{ $v->name }}</span>
+                                <span class="sub">{{ $v->city->name ?? '—' }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    class="b b-{{ $v->status === 'approved' ? 'green' : ($v->status === 'pending' ? 'yellow' : ($v->status === 'rejected' ? 'red' : 'gray')) }}">{{ ucfirst($v->status ?? 'N/A') }}</span>
+                            </td>
+                            <td>
+                                @if($v->is_featured)<span class="b b-rose">★</span>@endif
+                                @if($v->is_verified)<span class="b b-blue">✓</span>@endif
+                            </td>
+                            <td class="mono">{{ $v->created_at?->format('d M') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <p>No vendors yet</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-        <table class="tbl">
-            <thead>
-                <tr>
-                    <th>Booking #</th>
-                    <th>Vendor</th>
-                    <th>Contact</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentBookings as $booking)
+
+        <!-- Recent Bookings -->
+        <div class="panel">
+            <div class="panel-h">
+                <h2><span class="mi material-icons-round">event_note</span> Bookings</h2>
+            </div>
+            <table class="tbl">
+                <thead>
                     <tr>
-                        <td><strong>{{ $booking->booking_number }}</strong></td>
-                        <td>{{ $booking->vendor->name ?? '—' }}</td>
-                        <td>{{ $booking->contact_name ?? '—' }}</td>
-                        <td>{{ $booking->event_date?->format('d M Y') ?? '—' }}</td>
-                        <td>
-                            <span
-                                class="badge badge-{{ $booking->status === 'confirmed' ? 'green' : ($booking->status === 'pending' ? 'yellow' : 'gray') }}">
-                                {{ ucfirst($booking->status ?? 'N/A') }}
-                            </span>
-                        </td>
+                        <th>Booking</th>
+                        <th>Status</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" style="text-align:center;color:var(--t3);padding:2rem">No bookings yet</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($recentBookings as $bk)
+                        <tr>
+                            <td>
+                                <span class="name">{{ $bk->booking_number }}</span>
+                                <span class="sub">{{ $bk->vendor->name ?? '—' }} ·
+                                    {{ $bk->event_date?->format('d M') ?? '—' }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    class="b b-{{ $bk->status === 'confirmed' ? 'green' : ($bk->status === 'pending' ? 'yellow' : 'gray') }}">{{ ucfirst($bk->status ?? 'N/A') }}</span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="empty-state">
+                                <p>No bookings</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection

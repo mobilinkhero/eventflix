@@ -1,176 +1,233 @@
 @extends('admin.layout')
-@section('title', isset($vendor) ? 'Edit Vendor' : 'Add Vendor')
+@section('title', isset($vendor) ? 'Edit: ' . $vendor->name : 'New Vendor')
 
 @section('content')
-    <div style="display:flex;gap:1.5rem;align-items:flex-start">
-        <!-- Main Form -->
-        <div style="flex:1">
-            <form method="POST"
-                action="{{ isset($vendor) ? route('admin.vendors.update', $vendor) : route('admin.vendors.store') }}">
-                @csrf
-                @if(isset($vendor)) @method('PUT') @endif
+    <form method="POST"
+        action="{{ isset($vendor) ? route('admin.vendors.update', $vendor) : route('admin.vendors.store') }}">
+        @csrf
+        @if(isset($vendor)) @method('PUT') @endif
 
+        <div style="display:flex;gap:.75rem;align-items:flex-start">
+            <div style="flex:1;min-width:0">
+                <!-- Basic Info -->
                 <div class="form-card">
-                    <h2>Basic Information</h2>
-                    <div class="fg">
-                        <label>Vendor Name *</label>
-                        <input type="text" name="name" class="fi" value="{{ old('name', $vendor->name ?? '') }}" required>
-                    </div>
-                    <div class="fg-row">
+                    <div class="form-card-h"><span class="mi material-icons-round">info</span> Basic Information</div>
+                    <div class="form-card-b">
+                        <div class="fg-row">
+                            <div class="fg">
+                                <label>Vendor Name *</label>
+                                <input type="text" name="name" class="fi" value="{{ old('name', $vendor->name ?? '') }}"
+                                    required>
+                            </div>
+                            <div class="fg">
+                                <label>City *</label>
+                                <select name="city_id" class="fi" required>
+                                    <option value="">Select</option>
+                                    @foreach($cities as $city)
+                                        <option value="{{ $city->id }}" {{ old('city_id', $vendor->city_id ?? '') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="fg">
-                            <label>City *</label>
-                            <select name="city_id" class="fi" required>
-                                <option value="">Select City</option>
-                                @foreach($cities as $city)
-                                    <option value="{{ $city->id }}" {{ old('city_id', $vendor->city_id ?? '') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
+                            <label>Short Description</label>
+                            <input type="text" name="short_description" class="fi"
+                                value="{{ old('short_description', $vendor->short_description ?? '') }}">
+                            <div class="hint">Brief tagline shown in cards (max 255 chars)</div>
+                        </div>
+                        <div class="fg">
+                            <label>Full Description</label>
+                            <textarea name="description" class="fi"
+                                rows="4">{{ old('description', $vendor->description ?? '') }}</textarea>
+                        </div>
+                        <div class="fg">
+                            <label>Categories</label>
+                            <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.2rem">
+                                @php $sel = old('categories', isset($vendor) ? $vendor->categories->pluck('id')->toArray() : []); @endphp
+                                @foreach($categories as $cat)
+                                    <label class="chip {{ in_array($cat->id, $sel) ? 'on' : '' }}" style="cursor:pointer">
+                                        <input type="checkbox" name="categories[]" value="{{ $cat->id }}" {{ in_array($cat->id, $sel) ? 'checked' : '' }} style="display:none"
+                                            onchange="this.parentElement.classList.toggle('on')">
+                                        {{ $cat->name }}
+                                    </label>
                                 @endforeach
-                            </select>
-                        </div>
-                        <div class="fg">
-                            <label>Status *</label>
-                            <select name="status" class="fi" required>
-                                <option value="pending" {{ old('status', $vendor->status ?? 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="approved" {{ old('status', $vendor->status ?? '') === 'approved' ? 'selected' : '' }}>Approved</option>
-                                <option value="rejected" {{ old('status', $vendor->status ?? '') === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                <option value="suspended" {{ old('status', $vendor->status ?? '') === 'suspended' ? 'selected' : '' }}>Suspended</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="fg">
-                        <label>Short Description</label>
-                        <input type="text" name="short_description" class="fi"
-                            value="{{ old('short_description', $vendor->short_description ?? '') }}" maxlength="255">
-                    </div>
-                    <div class="fg">
-                        <label>Full Description</label>
-                        <textarea name="description"
-                            class="fi">{{ old('description', $vendor->description ?? '') }}</textarea>
-                    </div>
-                    <div class="fg">
-                        <label>Categories</label>
-                        <div style="display:flex;flex-wrap:wrap;gap:.5rem;padding:.5rem 0">
-                            @php $selectedCats = old('categories', isset($vendor) ? $vendor->categories->pluck('id')->toArray() : []); @endphp
-                            @foreach($categories as $cat)
-                                <label
-                                    style="display:flex;align-items:center;gap:.3rem;font-size:.82rem;padding:.35rem .7rem;border:1px solid var(--brd);border-radius:6px;cursor:pointer;{{ in_array($cat->id, $selectedCats) ? 'background:var(--pri-l);border-color:var(--pri)' : '' }}">
-                                    <input type="checkbox" name="categories[]" value="{{ $cat->id }}" {{ in_array($cat->id, $selectedCats) ? 'checked' : '' }} style="accent-color:var(--pri-d)">
-                                    {{ $cat->name }}
-                                </label>
-                            @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Contact -->
                 <div class="form-card">
-                    <h2>Contact Information</h2>
-                    <div class="fg-row">
-                        <div class="fg">
-                            <label>Phone</label>
-                            <input type="text" name="phone" class="fi" value="{{ old('phone', $vendor->phone ?? '') }}">
+                    <div class="form-card-h"><span class="mi material-icons-round">contact_phone</span> Contact</div>
+                    <div class="form-card-b">
+                        <div class="fg-row-3">
+                            <div class="fg">
+                                <label>Phone</label>
+                                <input type="text" name="phone" class="fi" value="{{ old('phone', $vendor->phone ?? '') }}">
+                            </div>
+                            <div class="fg">
+                                <label>WhatsApp</label>
+                                <input type="text" name="whatsapp" class="fi"
+                                    value="{{ old('whatsapp', $vendor->whatsapp ?? '') }}">
+                            </div>
+                            <div class="fg">
+                                <label>Email</label>
+                                <input type="email" name="email" class="fi"
+                                    value="{{ old('email', $vendor->email ?? '') }}">
+                            </div>
                         </div>
-                        <div class="fg">
-                            <label>WhatsApp</label>
-                            <input type="text" name="whatsapp" class="fi"
-                                value="{{ old('whatsapp', $vendor->whatsapp ?? '') }}">
+                        <div class="fg-row">
+                            <div class="fg">
+                                <label>Website</label>
+                                <input type="url" name="website" class="fi"
+                                    value="{{ old('website', $vendor->website ?? '') }}" placeholder="https://">
+                            </div>
+                            <div class="fg">
+                                <label>Address</label>
+                                <input type="text" name="address" class="fi"
+                                    value="{{ old('address', $vendor->address ?? '') }}">
+                            </div>
                         </div>
-                    </div>
-                    <div class="fg-row">
-                        <div class="fg">
-                            <label>Email</label>
-                            <input type="email" name="email" class="fi" value="{{ old('email', $vendor->email ?? '') }}">
-                        </div>
-                        <div class="fg">
-                            <label>Website</label>
-                            <input type="url" name="website" class="fi" value="{{ old('website', $vendor->website ?? '') }}"
-                                placeholder="https://">
-                        </div>
-                    </div>
-                    <div class="fg">
-                        <label>Address</label>
-                        <input type="text" name="address" class="fi" value="{{ old('address', $vendor->address ?? '') }}">
                     </div>
                 </div>
 
+                <!-- Pricing -->
                 <div class="form-card">
-                    <h2>Pricing</h2>
-                    <div class="fg-row">
-                        <div class="fg">
-                            <label>Min Price (PKR)</label>
-                            <input type="number" name="price_min" class="fi"
-                                value="{{ old('price_min', $vendor->price_min ?? '') }}" min="0" step="0.01">
+                    <div class="form-card-h"><span class="mi material-icons-round">payments</span> Pricing</div>
+                    <div class="form-card-b">
+                        <div class="fg-row-3">
+                            <div class="fg">
+                                <label>Min Price (PKR)</label>
+                                <input type="number" name="price_min" class="fi"
+                                    value="{{ old('price_min', $vendor->price_min ?? '') }}" min="0" step="0.01">
+                            </div>
+                            <div class="fg">
+                                <label>Max Price (PKR)</label>
+                                <input type="number" name="price_max" class="fi"
+                                    value="{{ old('price_max', $vendor->price_max ?? '') }}" min="0" step="0.01">
+                            </div>
+                            <div class="fg">
+                                <label>Price Unit</label>
+                                <input type="text" name="price_unit" class="fi"
+                                    value="{{ old('price_unit', $vendor->price_unit ?? '') }}" placeholder="per event">
+                            </div>
                         </div>
-                        <div class="fg">
-                            <label>Max Price (PKR)</label>
-                            <input type="number" name="price_max" class="fi"
-                                value="{{ old('price_max', $vendor->price_max ?? '') }}" min="0" step="0.01">
-                        </div>
-                    </div>
-                    <div class="fg">
-                        <label>Price Unit</label>
-                        <input type="text" name="price_unit" class="fi"
-                            value="{{ old('price_unit', $vendor->price_unit ?? '') }}"
-                            placeholder="e.g. per event, per hour">
                     </div>
                 </div>
 
+                <!-- Media -->
                 <div class="form-card">
-                    <h2>Media & Flags</h2>
-                    <div class="fg">
-                        <label>Image URL</label>
-                        <input type="text" name="image" class="fi" value="{{ old('image', $vendor->image ?? '') }}"
-                            placeholder="https://...">
-                    </div>
-                    <div style="display:flex;gap:1.5rem;margin-top:.75rem">
-                        <div class="fg-check">
-                            <input type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', $vendor->is_active ?? true) ? 'checked' : '' }}>
-                            <label for="is_active">Active</label>
-                        </div>
-                        <div class="fg-check">
-                            <input type="checkbox" id="is_verified" name="is_verified" value="1" {{ old('is_verified', $vendor->is_verified ?? false) ? 'checked' : '' }}>
-                            <label for="is_verified">Verified</label>
-                        </div>
-                        <div class="fg-check">
-                            <input type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $vendor->is_featured ?? false) ? 'checked' : '' }}>
-                            <label for="is_featured">Featured</label>
+                    <div class="form-card-h"><span class="mi material-icons-round">image</span> Media</div>
+                    <div class="form-card-b">
+                        <div class="fg">
+                            <label>Cover Image URL</label>
+                            <input type="text" name="image" class="fi" value="{{ old('image', $vendor->image ?? '') }}"
+                                placeholder="https://...">
                         </div>
                     </div>
                 </div>
 
-                <div style="display:flex;gap:.75rem">
+                <!-- Submit -->
+                <div style="display:flex;gap:.4rem;margin-top:.25rem">
                     <button type="submit" class="btn btn-pri"><span class="mi material-icons-round">save</span>
-                        {{ isset($vendor) ? 'Update Vendor' : 'Create Vendor' }}</button>
+                        {{ isset($vendor) ? 'Save Changes' : 'Create Vendor' }}</button>
                     <a href="{{ route('admin.vendors.index') }}" class="btn btn-out">Cancel</a>
-                </div>
-            </form>
-        </div>
-
-        <!-- Sidebar Preview -->
-        @if(isset($vendor))
-            <div style="width:280px;flex-shrink:0">
-                <div class="form-card" style="position:sticky;top:80px">
-                    <h2>Quick Info</h2>
-                    <div style="font-size:.82rem;color:var(--t2);line-height:1.8">
-                        <div><strong>ID:</strong> {{ $vendor->id }}</div>
-                        <div><strong>Slug:</strong> {{ $vendor->slug }}</div>
-                        <div><strong>Rating:</strong> ★ {{ number_format($vendor->rating, 1) }} ({{ $vendor->total_reviews }}
-                            reviews)</div>
-                        <div><strong>Bookings:</strong> {{ $vendor->total_bookings }}</div>
-                        <div><strong>Created:</strong> {{ $vendor->created_at?->format('d M Y') }}</div>
-                        <div><strong>Updated:</strong> {{ $vendor->updated_at?->diffForHumans() }}</div>
-                    </div>
-                    @if($vendor->services->count())
-                        <h2 style="margin-top:1.25rem">Services ({{ $vendor->services->count() }})</h2>
-                        <div style="font-size:.8rem;color:var(--t2)">
-                            @foreach($vendor->services as $service)
-                                <div style="padding:.4rem 0;border-bottom:1px solid var(--brd)">
-                                    {{ $service->name }}
-                                    @if($service->price) — PKR {{ number_format($service->price) }} @endif
-                                </div>
-                            @endforeach
-                        </div>
+                    @if(isset($vendor))
+                        <div style="flex:1"></div>
+                        <a href="{{ route('admin.vendors.destroy', $vendor) }}" class="btn btn-red"
+                            onclick="event.preventDefault();if(confirm('Delete?'))document.getElementById('del-form').submit()">
+                            <span class="mi material-icons-round">delete_outline</span> Delete
+                        </a>
                     @endif
                 </div>
             </div>
-        @endif
-    </div>
+
+            <!-- Sidebar -->
+            <div style="width:240px;flex-shrink:0">
+                <!-- Status Card -->
+                <div class="form-card">
+                    <div class="form-card-h"><span class="mi material-icons-round">tune</span> Status & Flags</div>
+                    <div class="form-card-b">
+                        <div class="fg">
+                            <label>Status *</label>
+                            <select name="status" class="fi" required>
+                                <option value="pending" {{ old('status', $vendor->status ?? 'pending') === 'pending' ? 'selected' : '' }}>⏳ Pending</option>
+                                <option value="approved" {{ old('status', $vendor->status ?? '') === 'approved' ? 'selected' : '' }}>✅ Approved</option>
+                                <option value="rejected" {{ old('status', $vendor->status ?? '') === 'rejected' ? 'selected' : '' }}>❌ Rejected</option>
+                                <option value="suspended" {{ old('status', $vendor->status ?? '') === 'suspended' ? 'selected' : '' }}>🚫 Suspended</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem">
+                            <div style="display:flex;align-items:center;justify-content:space-between">
+                                <span style="font-size:.72rem;font-weight:500">Active</span>
+                                <label class="tog"><input type="checkbox" name="is_active" value="1" {{ old('is_active', $vendor->is_active ?? true) ? 'checked' : '' }}><span class="sl"></span></label>
+                            </div>
+                            <div style="display:flex;align-items:center;justify-content:space-between">
+                                <span style="font-size:.72rem;font-weight:500">Verified</span>
+                                <label class="tog"><input type="checkbox" name="is_verified" value="1" {{ old('is_verified', $vendor->is_verified ?? false) ? 'checked' : '' }}><span class="sl"></span></label>
+                            </div>
+                            <div style="display:flex;align-items:center;justify-content:space-between">
+                                <span style="font-size:.72rem;font-weight:500">Featured</span>
+                                <label class="tog"><input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $vendor->is_featured ?? false) ? 'checked' : '' }}><span class="sl"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if(isset($vendor))
+                    <!-- Quick Info -->
+                    <div class="form-card">
+                        <div class="form-card-h"><span class="mi material-icons-round">analytics</span> Stats</div>
+                        <div class="form-card-b" style="font-size:.72rem;color:var(--t2)">
+                            <div
+                                style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid var(--brd2)">
+                                <span>ID</span><span class="mono">#{{ $vendor->id }}</span>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid var(--brd2)">
+                                <span>Slug</span><span class="mono">{{ Str::limit($vendor->slug, 18) }}</span>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid var(--brd2)">
+                                <span>Rating</span><span>★ {{ number_format($vendor->rating, 1) }}
+                                    ({{ $vendor->total_reviews }})</span>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid var(--brd2)">
+                                <span>Bookings</span><span>{{ $vendor->total_bookings ?? 0 }}</span>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid var(--brd2)">
+                                <span>Created</span><span>{{ $vendor->created_at?->format('d M Y') }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:.25rem 0">
+                                <span>Updated</span><span>{{ $vendor->updated_at?->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($vendor->services->count())
+                        <div class="form-card">
+                            <div class="form-card-h"><span class="mi material-icons-round">room_service</span> Services
+                                ({{ $vendor->services->count() }})</div>
+                            <div class="form-card-b" style="font-size:.7rem">
+                                @foreach($vendor->services as $svc)
+                                    <div
+                                        style="display:flex;justify-content:space-between;padding:.2rem 0;border-bottom:1px solid var(--brd2);color:var(--t2)">
+                                        <span>{{ $svc->name }}</span>
+                                        <span class="mono">{{ $svc->price ? 'PKR ' . number_format($svc->price) : '—' }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                @endif
+            </div>
+        </div>
+    </form>
+
+    @if(isset($vendor))
+        <form id="del-form" method="POST" action="{{ route('admin.vendors.destroy', $vendor) }}" style="display:none">@csrf
+            @method('DELETE')</form>
+    @endif
 @endsection
