@@ -33,6 +33,7 @@ class Vendor extends Model
         'total_reviews',
         'total_bookings',
         'image',
+        'cover_image',
         'gallery',
         'social_links',
         'is_verified',
@@ -162,10 +163,10 @@ class Vendor extends Model
     public function getPriceRangeFormattedAttribute(): string
     {
         if ($this->price_min && $this->price_max) {
-            return 'PKR ' . number_format($this->price_min) . ' - ' . number_format($this->price_max);
+            return 'PKR ' . number_format((float) $this->price_min) . ' - ' . number_format((float) $this->price_max);
         }
         if ($this->price_min) {
-            return 'From PKR ' . number_format($this->price_min);
+            return 'From PKR ' . number_format((float) $this->price_min);
         }
         return 'Contact for pricing';
     }
