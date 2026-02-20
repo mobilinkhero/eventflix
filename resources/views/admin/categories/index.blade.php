@@ -26,9 +26,14 @@
                     <tr>
                         <td>
                             <div
-                                style="width:28px;height:28px;border-radius:6px;background:{{ $cat->color ?? '#b07272' }}18;display:flex;align-items:center;justify-content:center">
-                                <span class="mi material-icons-round"
-                                    style="font-size:14px;color:{{ $cat->color ?? '#b07272' }}">{{ $cat->icon ?? 'category' }}</span>
+                                style="width:28px;height:28px;border-radius:6px;background:{{ $cat->color ?? '#b07272' }}18;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                                @if(str_starts_with($cat->icon ?? '', 'uploaded:'))
+                                    <img src="{{ asset('storage/' . str_replace('uploaded:', '', $cat->icon)) }}"
+                                        style="width:20px;height:20px;object-fit:contain">
+                                @else
+                                    <span class="mi material-icons-round"
+                                        style="font-size:14px;color:{{ $cat->color ?? '#b07272' }}">{{ $cat->icon ?? 'category' }}</span>
+                                @endif
                             </div>
                         </td>
                         <td class="name">{{ $cat->name }}</td>
