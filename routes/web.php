@@ -9,7 +9,7 @@ use App\Http\Controllers\Web\CityController;
 use App\Http\Controllers\Web\PageController;
 
 // Serve storage files directly (shared hosting fix - no symlink needed)
-Route::get('/storage/{path}', function (string $path) {
+Route::get('/uploads/{path}', function (string $path) {
     $fullPath = storage_path('app/public/' . $path);
     if (!file_exists($fullPath)) {
         abort(404);

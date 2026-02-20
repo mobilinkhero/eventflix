@@ -14,7 +14,7 @@ class CategoryResource extends JsonResource
 
         // If icon starts with 'uploaded:', it's a file path
         if (str_starts_with($icon ?? '', 'uploaded:')) {
-            $iconImage = url('storage/' . str_replace('uploaded:', '', $icon));
+            $iconImage = url('uploads/' . str_replace('uploaded:', '', $icon));
             $icon = 'category'; // fallback material icon name
         }
 
@@ -26,7 +26,7 @@ class CategoryResource extends JsonResource
             'icon_image' => $iconImage,
             'color' => $this->color,
             'description' => $this->description,
-            'image' => $this->image ? url('storage/' . $this->image) : null,
+            'image' => $this->image ? url('uploads/' . $this->image) : null,
             'vendor_count' => $this->when($this->relationLoaded('vendors'), fn() => $this->vendors->count()),
         ];
     }

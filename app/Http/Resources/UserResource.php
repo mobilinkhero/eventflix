@@ -14,7 +14,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'avatar' => $this->avatar ? url('storage/' . $this->avatar) : null,
+            'avatar' => $this->avatar ? url('uploads/' . $this->avatar) : null,
             'account_type' => $this->account_type,
             'city' => new CityResource($this->whenLoaded('city')),
             'email_verified_at' => $this->email_verified_at?->toISOString(),

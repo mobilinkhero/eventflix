@@ -13,7 +13,7 @@ class BannerResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'image' => $this->image ? url('storage/' . $this->image) : null,
+            'image' => $this->image ? url('uploads/' . $this->image) : null,
             'link' => $this->link,
             'position' => $this->position,
         ];

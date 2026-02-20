@@ -17,7 +17,7 @@ class ReviewResource extends JsonResource
             'user' => $this->when(!$this->is_anonymous, [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
-                'avatar' => $this->user->avatar ? url('storage/' . $this->user->avatar) : null,
+                'avatar' => $this->user->avatar ? url('uploads/' . $this->user->avatar) : null,
             ]),
             'vendor_reply' => $this->vendor_reply,
             'vendor_replied_at' => $this->vendor_replied_at?->toISOString(),

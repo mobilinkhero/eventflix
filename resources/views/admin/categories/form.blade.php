@@ -45,7 +45,7 @@
                     <div id="iconPreview" class="icon-preview">
                         <div class="icon-preview-box" id="previewBox">
                             @if($isUploaded)
-                                <img src="{{ asset('storage/' . $uploadedPath) }}" id="previewImg"
+                                <img src="{{ url('uploads/' . $uploadedPath) }}" id="previewImg"
                                     style="width:26px;height:26px;object-fit:contain">
                                 <span class="material-icons-round" id="previewIcon" style="display:none">category</span>
                             @else
@@ -87,7 +87,7 @@
                         <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                             <div class="drop-zone-inner" id="dropInner">
                                 @if($isUploaded)
-                                    <img src="{{ asset('storage/' . $uploadedPath) }}" class="drop-zone-thumb" id="dropThumb">
+                                    <img src="{{ url('uploads/' . $uploadedPath) }}" class="drop-zone-thumb" id="dropThumb">
                                     <div class="drop-zone-info">
                                         <span class="drop-zone-name">{{ basename($uploadedPath) }}</span>
                                         <span class="drop-zone-hint">Click or drag to replace</span>

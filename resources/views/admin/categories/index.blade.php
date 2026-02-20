@@ -28,7 +28,7 @@
                             <div
                                 style="width:28px;height:28px;border-radius:6px;background:{{ $cat->color ?? '#b07272' }}18;display:flex;align-items:center;justify-content:center;overflow:hidden">
                                 @if(str_starts_with($cat->icon ?? '', 'uploaded:'))
-                                    <img src="{{ asset('storage/' . str_replace('uploaded:', '', $cat->icon)) }}"
+                                    <img src="{{ url('uploads/' . str_replace('uploaded:', '', $cat->icon)) }}"
                                         style="width:20px;height:20px;object-fit:contain">
                                 @else
                                     <span class="mi material-icons-round"
