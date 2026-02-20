@@ -74,21 +74,8 @@ class HomeController extends Controller
             'success' => true,
             'data' => [
                 'banners' => BannerResource::collection($banners),
-                'categories' => $categories->map(fn($cat) => [
-                    'id' => $cat->id,
-                    'name' => $cat->name,
-                    'slug' => $cat->slug,
-                    'icon' => $cat->icon,
-                    'color' => $cat->color,
-                    'vendor_count' => $cat->vendors_count,
-                ]),
-                'cities' => $cities->map(fn($city) => [
-                    'id' => $city->id,
-                    'name' => $city->name,
-                    'slug' => $city->slug,
-                    'image' => $city->image ? url('storage/' . $city->image) : null,
-                    'vendor_count' => $city->vendors_count,
-                ]),
+                'categories' => CategoryResource::collection($categories),
+                'cities' => CityResource::collection($cities),
                 'featured_vendors' => VendorResource::collection($featured),
                 'popular_vendors' => VendorResource::collection($popular),
                 'new_vendors' => VendorResource::collection($newVendors),

@@ -27,7 +27,7 @@ class CategoryResource extends JsonResource
             'color' => $this->color,
             'description' => $this->description,
             'image' => $this->image ? url('uploads/' . $this->image) : null,
-            'vendor_count' => $this->when($this->relationLoaded('vendors'), fn() => $this->vendors->count()),
+            'vendor_count' => $this->vendors_count ?? ($this->relationLoaded('vendors') ? $this->vendors->count() : 0),
         ];
     }
 }

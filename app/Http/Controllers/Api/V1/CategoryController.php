@@ -25,16 +25,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $categories->map(fn($cat) => [
-                'id' => $cat->id,
-                'name' => $cat->name,
-                'slug' => $cat->slug,
-                'icon' => $cat->icon,
-                'color' => $cat->color,
-                'description' => $cat->description,
-                'image' => $cat->image ? url('storage/' . $cat->image) : null,
-                'vendor_count' => $cat->vendors_count,
-            ]),
+            'data' => CategoryResource::collection($categories),
         ]);
     }
 
