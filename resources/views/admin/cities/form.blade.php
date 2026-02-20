@@ -3,7 +3,7 @@
 
 @section('content')
     <form method="POST" action="{{ isset($city) ? route('admin.cities.update', $city) : route('admin.cities.store') }}"
-        style="max-width:520px">
+        enctype="multipart/form-data" style="max-width:520px">
         @csrf
         @if(isset($city)) @method('PUT') @endif
 
@@ -21,11 +21,29 @@
                             placeholder="Punjab">
                     </div>
                 </div>
+
                 <div class="fg">
-                    <label>Image URL</label>
-                    <input type="text" name="image" class="fi" value="{{ old('image', $city->image ?? '') }}"
-                        placeholder="https://...">
+                    <label>City Icon / Image</label>
+                    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <div class="drop-zone-inner" id="dropInner">
+                            @if(isset($city) && $city->image)
+                                <img src="{{ url('uploads/' . $city->image) }}" class="drop-zone-thumb" id="dropThumb">
+                                <div class="drop-zone-info">
+                                    <span class="drop-zone-name">{{ basename($city->image) }}</span>
+                                    <span class="drop-zone-hint">Click or drag to replace</span>
+                                </div>
+                            @else
+                                <span class="mi material-icons-round" style="font-size:2rem;color:var(--t4)">cloud_upload</span>
+                                <div class="drop-zone-info">
+                                    <span class="drop-zone-name">Choose an image</span>
+                                    <span class="drop-zone-hint">PNG, JPG, SVG or WebP (max 2MB)</span>
+                                </div>
+                            @endif
+                        </div>
+                        <input type="file" name="image_file" id="fileInput" accept="image/*" style="display:none">
+                    </div>
                 </div>
+
                 <div class="fg-row">
                     <div class="fg">
                         <label>Sort Order</label>
@@ -48,4 +66,99 @@
             <a href="{{ route('admin.cities.index') }}" class="btn btn-out">Cancel</a>
         </div>
     </form>
+
+    <style>
+        .drop-zone {
+            border: 2px dashed var(--b2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all .2s;
+            background: var(--bg-card);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--rose);
+            background: var(--rose-light);
+        }
+
+        .drop-zone-inner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .drop-zone-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--b2);
+        }
+
+        .drop-zone-info {
+            display: flex;
+            flex-direction: column;
+            gap: .2rem;
+        }
+
+        .drop-zone-name {
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--t1);
+        }
+
+        .drop-zone-hint {
+            font-size: .72rem;
+            color: var(--t3);
+        }
+    </style>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const dropInner = document.getElementById('dropInner');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+            });
+        });
+
+        ['dragenter', 'dragover'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.add('dragover'));
+        });
+
+        ['dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'));
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                handleFiles(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFiles(e.target.files[0]);
+        });
+
+        function handleFiles(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                dropInner.innerHTML = `
+                        <img src="${e.target.result}" class="drop-zone-thumb">
+                        <div class="drop-zone-info">
+                            <span class="drop-zone-name">${file.name}</span>
+                            <span class="drop-zone-hint">Ready to upload</span>
+                        </div>
+                    `;
+            }
+            reader.readAsDataURL(file);
+        }
+    </script>
 @endsection

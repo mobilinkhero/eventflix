@@ -24,7 +24,21 @@
             <tbody>
                 @forelse($cities as $city)
                     <tr>
-                        <td class="name">{{ $city->name }}</td>
+                        <td class="name">
+                            <div style="display:flex;align-items:center;gap:.6rem">
+                                <div
+                                    style="width:28px;height:28px;border-radius:6px;background:var(--bg2);display:flex;align-items:center;justify-content:center;overflow:hidden">
+                                    @if($city->image)
+                                        <img src="{{ url('uploads/' . $city->image) }}"
+                                            style="width:100%;height:100%;object-fit:cover">
+                                    @else
+                                        <span class="mi material-icons-round"
+                                            style="font-size:14px;color:var(--t4)">apartment</span>
+                                    @endif
+                                </div>
+                                {{ $city->name }}
+                            </div>
+                        </td>
                         <td style="color:var(--t2)">{{ $city->province ?? '—' }}</td>
                         <td class="mono">{{ $city->slug }}</td>
                         <td><span class="b b-gray">{{ $city->vendors_count }}</span></td>
