@@ -43,6 +43,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VendorController as AdminVendorController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CityController as AdminCityController;
+use App\Http\Controllers\Admin\ServiceController;
 
 // Login (no middleware)
 Route::get('/admin/login', [DashboardController::class, 'login'])->name('admin.login');
@@ -60,6 +61,11 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/vendors/{vendor}/edit', [AdminVendorController::class, 'edit'])->name('vendors.edit');
     Route::put('/vendors/{vendor}', [AdminVendorController::class, 'update'])->name('vendors.update');
     Route::delete('/vendors/{vendor}', [AdminVendorController::class, 'destroy'])->name('vendors.destroy');
+
+    // Packages / Services
+    Route::post('/vendors/{vendor}/services', [ServiceController::class, 'store'])->name('services.store');
+    Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
+    Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
     // Categories
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
