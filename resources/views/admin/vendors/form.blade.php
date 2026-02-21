@@ -328,40 +328,45 @@
                 </div>
 
                 <!-- GPS Map Card -->
+                <!-- Google Business Integration -->
                 <div class="form-card">
                     <div class="form-card-h" style="display:flex;justify-content:space-between;align-items:center">
-                        <div><span class="mi material-icons-round">map</span> Global Positioning (GPS)</div>
-                        <div style="font-size:0.7rem;font-weight:400;color:var(--t4)">Exact "Google Maps" Location</div>
+                        <div><span class="mi material-icons-round">business</span> Google Business Connectivity</div>
+                        <div style="font-size:0.7rem;font-weight:400;color:var(--t4)">Direct "Place ID" Linking</div>
                     </div>
-                    <div style="position:relative">
-                        <!-- Google Places Search Bar -->
-                        <div class="map-search-wrapper">
-                            <input id="pac-input" class="fi" type="text" placeholder="Search business, city, or street...">
-                        </div>
-
-                        <input type="hidden" name="latitude" id="latInput"
-                            value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
-                        <input type="hidden" name="longitude" id="lngInput"
-                            value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
-
-                        <div
-                            style="padding:1rem;background:var(--bg);display:flex;gap:1rem;border-bottom:1px solid var(--brd)">
-                            <div class="fg" style="margin-bottom:0;flex:1">
-                                <label style="font-size:0.65rem;color:var(--t4)">Google Place ID (For Real Reviews)</label>
-                                <input type="text" name="google_place_id" id="placeIdInput" class="fi"
-                                    style="font-family:monospace;font-size:0.75rem"
-                                    value="{{ old('google_place_id', $vendor->google_place_id ?? '') }}"
-                                    placeholder="Select from search results...">
+                    <div class="form-card-b">
+                        <div class="fg">
+                            <label>Search Google for Business</label>
+                            <div style="position:relative">
+                                <input id="pac-input" class="fi" type="text" placeholder="Start typing business name (e.g. PC Hotel)..." style="padding-left:2.5rem">
+                                <span class="mi material-icons-round" style="position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);color:var(--t4);font-size:1.2rem">search</span>
                             </div>
+                            <p style="font-size:0.65rem;color:var(--t3);margin-top:0.4rem">Select from the suggestions to automatically fetch the Place ID and Coordinates.</p>
                         </div>
 
-                        <div id="map"></div>
-
-                        <div class="coord-pill">
-                            <span class="mi material-icons-round"
-                                style="font-size:1.1rem;color:var(--pri)">my_location</span>
-                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }},
-                                {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
+                        <div style="margin-top:1.5rem;padding:1rem;background:var(--bg);border-radius:12px;border:1px solid var(--brd);display:flex;flex-direction:column;gap:1rem">
+                            <div class="fg" style="margin-bottom:0">
+                                <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px">Google Place ID</label>
+                                <input type="text" name="google_place_id" id="placeIdInput" class="fi"
+                                    style="font-family:monospace;font-size:0.8rem;background:white"
+                                    value="{{ old('google_place_id', $vendor->google_place_id ?? '') }}"
+                                    placeholder="Auto-filled via search or paste here">
+                            </div>
+                            
+                            <div style="display:flex;gap:1rem">
+                                <div class="fg" style="margin-bottom:0;flex:1">
+                                    <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px">Latitude</label>
+                                    <input type="text" name="latitude" id="latInput" class="fi" readonly
+                                        style="font-size:0.8rem;background:var(--bg2)"
+                                        value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
+                                </div>
+                                <div class="fg" style="margin-bottom:0;flex:1">
+                                    <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px">Longitude</label>
+                                    <input type="text" name="longitude" id="lngInput" class="fi" readonly
+                                        style="font-size:0.8rem;background:var(--bg2)"
+                                        value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -459,18 +464,29 @@
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
     <script>     function previewFile(input, previewId, uploaderId) {         const file = input.files[0];         const preview = document.getElementById(previewId);         const uploader = document.getElementById(uploaderId);         if (file) {             const reader = new FileReader();             reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; uploader.classList.add('has-image'); }             reader.readAsDataURL(file);         }     }
-         document.addEventListener('DOMContentLoaded', function () {         setTimeout(() => {             let lat = parseFloat(document.getElementById('latInput').value) || 24.8607;             let lng = parseFloat(document.getElementById('lngInput').value) || 67.0011;
-                 // Initialize Google Map             const map = new google.maps.Map(document.getElementById("map"), {                 center: { lat: lat, lng: lng },                 zoom: 15,                 mapTypeControl: false,                 fullscreenControl: false,                 streetViewControl: false,                 styles: [                     { featureType: "poi", stylers: [{ visibility: "off" }] }                 ]             });
-                 // Initialize Marker             const marker = new google.maps.Marker({                 position: { lat: lat, lng: lng },                 map: map,                 draggable: true,                 animation: google.maps.Animation.DROP             });
-                 // Initialize Search Control             const input = document.getElementById("pac-input");             const autocomplete = new google.maps.places.Autocomplete(input);             autocomplete.bindTo("bounds", map);
-                 // Update Coordinates UI             function updateInputs(l, g) {                 document.getElementById('latInput').value = l.toFixed(6);                 document.getElementById('lngInput').value = g.toFixed(6);                 document.getElementById('coordDisplay').innerText = l.toFixed(6) + ', ' + g.toFixed(6);             }
-                 // Autocomplete Event             autocomplete.addListener("place_changed", () => {                 const place = autocomplete.getPlace();                 if (!place.geometry || !place.geometry.location) return;
-                     if (place.geometry.viewport) {                     map.fitBounds(place.geometry.viewport);                 } else {                     map.setCenter(place.geometry.location);                     map.setZoom(17);                 }
-                     marker.setPosition(place.geometry.location);                 updateInputs(place.geometry.location.lat(), place.geometry.location.lng());
-                     if (place.place_id) {                     document.getElementById('placeIdInput').value = place.place_id;                 }             });
-                 // Click to Pin             map.addListener("click", (e) => {                 marker.setPosition(e.latLng);                 updateInputs(e.latLng.lat(), e.latLng.lng());             });
-                 // Drag to Pin             marker.addListener("dragend", () => {                 const pos = marker.getPosition();                 updateInputs(pos.lat(), pos.lng());             });
-             }, 500);     });
+         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Search Control (No map div needed)
+            const input = document.getElementById("pac-input");
+            if (input) {
+                const autocomplete = new google.maps.places.Autocomplete(input);
+
+                // Autocomplete Event
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (!place.geometry || !place.geometry.location) return;
+
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
+
+                    document.getElementById('latInput').value = lat.toFixed(6);
+                    document.getElementById('lngInput').value = lng.toFixed(6);
+                    
+                    if (place.place_id) {
+                        document.getElementById('placeIdInput').value = place.place_id;
+                    }
+                });
+            }
+        });
          function handleGallerySelect(input) {         const files = Array.from(input.files);         const grid = document.getElementById('galleryGrid');         files.forEach(file => {             const reader = new FileReader();             reader.onload = e => {                 const div = document.createElement('div');                 div.className = 'gallery-mgr-item gallery-new-preview';                 div.innerHTML = `<img src="${e.target.result}"><div class="new-tag">NEW</div>`;                 grid.insertBefore(div, grid.querySelector('.gallery-upload-placeholder'));             };             reader.readAsDataURL(file);         });     }
     </script>
 @endsection
