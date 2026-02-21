@@ -179,7 +179,7 @@
                         <div><span class="mi material-icons-round">collections</span> Professional Portfolio</div>
                         <label class="btn btn-out btn-xs" style="cursor:pointer">
                             <span class="mi material-icons-round">add_photo_alternate</span> Add Photos
-                            <input type="file" name="gallery_files[]" multiple accept="image/*" style="display:none" 
+                            <input type="file" name="gallery_files[]" id="galleryInput" multiple accept="image/*" style="display:none" 
                                 onchange="handleGallerySelect(this)">
                         </label>
                     </div>
@@ -190,13 +190,14 @@
                                     <div class="gallery-mgr-item">
                                         <img src="{{ Str::startsWith($img, 'http') ? $img : url('uploads/' . $img) }}">
                                         <label class="mgr-del">
-                                            <input type="checkbox" name="remove_gallery_images[]" value="{{ $img }}">
+                                            <input type="checkbox" name="remove_gallery_images[]" value="{{ $img }}"
+                                                onchange="this.closest('.gallery-mgr-item').classList.toggle('to-delete', this.checked)">
                                             <span class="mi material-icons-round">delete</span>
                                         </label>
                                     </div>
                                 @endforeach
                             @endif
-                            <div class="gallery-upload-placeholder" onclick="this.previousElementSibling.previousElementSibling.click()">
+                            <div class="gallery-upload-placeholder" onclick="document.getElementById('galleryInput').click()">
                                 <span class="mi material-icons-round">cloud_upload</span>
                                 <span>Drop or Click to add more</span>
                             </div>
@@ -300,25 +301,6 @@
                     </div>
                 </div>
 
-                @if(isset($vendor))
-                    <!-- Gallery Preview -->
-                    <div class="form-card">
-                        <div class="form-card-h"><span class="mi material-icons-round">collections</span> Portfolio</div>
-                        <div class="form-card-b">
-                            <div class="gallery-mini-grid">
-                                @if($vendor->gallery && count($vendor->gallery))
-                                    @foreach(array_slice($vendor->gallery, 0, 4) as $img)
-                                        <div class="gallery-mini-item"><img
-                                                src="{{ Str::startsWith($img, 'http') ? $img : url('uploads/' . $img) }}"></div>
-                                    @endforeach
-                                @else
-                                    <div class="empty-mini" style="grid-column: span 2">No gallery images yet.</div>
-                                @endif
-                            </div>
-                            <a href="#" class="btn btn-ghost btn-block btn-xs" style="margin-top:.5rem">Manage Portfolio</a>
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
     </form>
@@ -642,11 +624,17 @@
             color: #444;
         }
 
-        .mgr-del:has(input:checked) {
+        .gallery-mgr-item.to-delete {
+            opacity: 0.6;
+            filter: grayscale(1);
+            border-color: #dc3545;
+        }
+
+        .gallery-mgr-item.to-delete .mgr-del {
             background: #dc3545;
         }
 
-        .mgr-del:has(input:checked) span {
+        .gallery-mgr-item.to-delete .mgr-del span {
             color: white;
         }
 
@@ -678,6 +666,29 @@
         .gallery-upload-placeholder span:last-child {
             font-size: 0.7rem;
             font-weight: 500;
+        }
+
+        .gallery-new-preview {
+            border: 2px solid var(--pri) !important;
+            animation: fadeIn .3s ease;
+        }
+
+        .new-tag {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--pri);
+            color: white;
+            font-size: .55rem;
+            font-weight: 800;
+            padding: .2rem .5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .text-red {
@@ -737,10 +748,30 @@
         }
 
         function handleGallerySelect(input) {
-            const count = input.files.length;
+            const files = Array.from(input.files);
+            const grid = document.getElementById('galleryGrid');
+            const placeholder = grid.querySelector('.gallery-upload-placeholder');
             const counter = document.getElementById('newPhotosCount');
-            if (count > 0) {
-                counter.innerText = `+ ${count} new photo(s) selected for upload`;
+            
+            // Remove previous previews
+            grid.querySelectorAll('.gallery-new-preview').forEach(el => el.remove());
+
+            if (files.length > 0) {
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.className = 'gallery-mgr-item gallery-new-preview';
+                        div.innerHTML = `
+                            <img src="${e.target.result}">
+                            <div class="new-tag">NEW</div>
+                        `;
+                        grid.insertBefore(div, placeholder);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                counter.innerText = `+ ${files.length} new photo(s) ready to upload`;
                 counter.style.display = 'block';
             } else {
                 counter.style.display = 'none';
