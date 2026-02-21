@@ -4,6 +4,108 @@
 @section('css')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        /* Premium Header Styling */
+        .cover-card {
+            position: relative;
+            background: #fff;
+            margin-bottom: 3rem !important;
+            overflow: visible !important;
+        }
+
+        .cover-uploader {
+            height: 220px;
+            background: #f1f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px 12px 0 0;
+            transition: all 0.3s;
+        }
+
+        .cover-uploader img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+
+        .cover-uploader:hover {
+            opacity: 0.9;
+        }
+
+        .cover-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: #adb5bd;
+            z-index: 1;
+        }
+
+        .cover-uploader.has-image .cover-placeholder {
+            opacity: 0;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .cover-uploader.has-image:hover .cover-placeholder {
+            opacity: 1;
+        }
+
+        .profile-uploader-wrapper {
+            position: absolute;
+            left: 2rem;
+            bottom: -2.5rem;
+            z-index: 10;
+        }
+
+        .profile-uploader {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            background: #fff;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-uploader img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.1);
+            color: #fff;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .profile-uploader:hover .profile-placeholder {
+            opacity: 1;
+            background: rgba(0,0,0,0.4);
+        }
+
+        /* Map Styling */
         #map { height: 400px; border-radius: 0 0 12px 12px; border-top: 1px solid var(--brd2); z-index: 1; }
         .coord-pill { 
             position: absolute; bottom: 20px; left: 20px; z-index: 1000;
@@ -12,14 +114,46 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 1px solid var(--brd);
             display: flex; align-items: center; gap: 8px;
         }
-        .verify-box {
-            padding: 1rem; border-radius: 12px; background: var(--pri-xl);
-            border: 1px solid var(--pri-l); transition: all 0.3s;
+
+        /* Portflio Styling */
+        .gallery-manager-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
         }
-        .verify-box.verified {
-            background: #fff; border-color: var(--pri);
-            box-shadow: 0 4px 12px var(--pri-l);
+
+        .gallery-mgr-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background: #eee;
         }
+
+        .gallery-mgr-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mgr-del {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.9);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--red);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .gallery-mgr-item.to-delete img { opacity: 0.3; }
         .new-tag {
             position: absolute; top: 10px; left: 10px; background: var(--green);
             color: white; font-size: 0.6rem; font-weight: 800;
@@ -35,9 +169,9 @@
         @csrf
         @if(isset($vendor)) @method('PUT') @endif
 
-        <div style="display:flex;gap:.75rem;align-items:flex-start">
+        <div style="display:flex;gap:1.5rem;align-items:flex-start">
             <div style="flex:1;min-width:0">
-                <!-- Cover & Profile -->
+                <!-- Cover & Profile Section -->
                 <div class="form-card cover-card">
                     <div class="cover-uploader {{ isset($vendor) && $vendor->cover_image ? 'has-image' : '' }}"
                         id="coverUploader" onclick="document.getElementById('coverInput').click()">
@@ -74,10 +208,8 @@
                 </div>
 
                 <!-- Basic Info -->
-                <div class="form-card">
-                    <div class="form-card-h" style="display:flex;justify-content:space-between;align-items:center">
-                        <div><span class="mi material-icons-round">info</span> Professional Details</div>
-                    </div>
+                <div class="form-card" style="margin-top:1rem">
+                    <div class="form-card-h"><span class="mi material-icons-round">info</span> Professional Details</div>
                     <div class="form-card-b">
                         <div class="fg-row">
                             <div class="fg">
@@ -109,7 +241,7 @@
                     </div>
                 </div>
 
-                <!-- Contact & Location -->
+                <!-- Contact Info -->
                 <div class="form-card">
                     <div class="form-card-h"><span class="mi material-icons-round">contact_phone</span> Business Contact</div>
                     <div class="form-card-b">
@@ -134,7 +266,7 @@
                     </div>
                 </div>
 
-                <!-- GPS Map -->
+                <!-- GPS Map Card -->
                 <div class="form-card">
                     <div class="form-card-h" style="display:flex;justify-content:space-between;align-items:center">
                         <div><span class="mi material-icons-round">map</span> Global Positioning (GPS)</div>
@@ -173,27 +305,26 @@
                                     </div>
                                 @endforeach
                             @endif
-                            <div class="gallery-upload-placeholder" onclick="document.getElementById('galleryInput').click()">
-                                <span class="mi material-icons-round">cloud_upload</span>
-                                <span>Add more</span>
+                            <div class="gallery-upload-placeholder" style="aspect-ratio:1;border:2px dashed var(--brd);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3);cursor:pointer" onclick="document.getElementById('galleryInput').click()">
+                                <span class="mi material-icons-round" style="font-size:1.5rem">cloud_upload</span>
+                                <span style="font-size:0.6rem;font-weight:600">Add more</span>
                             </div>
                         </div>
-                        <div id="newPhotosCount" style="display:none;margin-top:1rem;font-size:0.7rem;color:var(--pri);font-weight:600"></div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div style="display:flex;gap:.5rem;margin-top:1.5rem;margin-bottom:3rem">
-                    <button type="submit" class="btn btn-pri" style="padding:.75rem 2rem">
+                <div style="display:flex;gap:.5rem;margin-top:1.5rem;margin-bottom:5rem">
+                    <button type="submit" class="btn btn-pri" style="padding:.75rem 2rem;font-size:0.85rem">
                         <span class="mi material-icons-round">{{ isset($vendor) ? 'check_circle' : 'save' }}</span>
                         {{ isset($vendor) ? 'Save Changes' : 'Create Vendor' }}
                     </button>
-                    <a href="{{ route('admin.vendors.index') }}" class="btn btn-out" style="padding:.75rem 1.5rem">Cancel</a>
+                    <a href="{{ route('admin.vendors.index') }}" class="btn btn-out" style="padding:.75rem 1.5rem;font-size:0.85rem">Cancel</a>
                 </div>
             </div>
 
             <!-- Right Sidebar -->
-            <div style="width:280px;flex-shrink:0">
+            <div style="width:300px;flex-shrink:0">
                 <div class="form-card">
                     <div class="form-card-h"><span class="mi material-icons-round">verified_user</span> Status & Security</div>
                     <div class="form-card-b">
@@ -205,65 +336,29 @@
                                 <option value="suspended" {{ old('status', $vendor->status ?? '') === 'suspended' ? 'selected' : '' }}>🚫 Suspended</option>
                             </select>
                         </div>
-                        <div class="verify-box {{ old('is_verified', $vendor->is_verified ?? false) ? 'verified' : '' }}">
+                        <div class="verify-box {{ old('is_verified', $vendor->is_verified ?? false) ? 'verified' : '' }}" style="padding:1rem;background:var(--bg);border-radius:12px;border:1px solid var(--brd)">
                             <div style="display:flex;align-items:center;justify-content:space-between">
                                 <span style="font-weight:600;font-size:.75rem">Authentic Badge</span>
                                 <label class="tog"><input type="checkbox" name="is_verified" value="1" {{ old('is_verified', $vendor->is_verified ?? false) ? 'checked' : '' }} onchange="this.closest('.verify-box').classList.toggle('verified', this.checked)"><span class="sl"></span></label>
                             </div>
                         </div>
-                        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--brd2);display:flex;flex-direction:column;gap:.75rem">
+                        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--brd2);display:flex;flex-direction:column;gap:1rem">
                             <div style="display:flex;align-items:center;justify-content:space-between">
-                                <span style="font-size:.75rem">Publicly Visible</span>
+                                <span style="font-size:.78rem;font-weight:500">Publicly Visible</span>
                                 <label class="tog"><input type="checkbox" name="is_active" value="1" {{ old('is_active', $vendor->is_active ?? true) ? 'checked' : '' }}><span class="sl"></span></label>
                             </div>
                             <div style="display:flex;align-items:center;justify-content:space-between">
-                                <span style="font-size:.75rem">Featured Profile</span>
+                                <span style="font-size:.78rem;font-weight:500">Featured Profile</span>
                                 <label class="tog"><input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $vendor->is_featured ?? false) ? 'checked' : '' }}><span class="sl"></span></label>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                @if(isset($vendor))
-                    <div class="form-card">
-                        <div class="form-card-h"><span class="mi material-icons-round">inventory_2</span> Packages</div>
-                        <div class="form-card-b">
-                            @if($vendor->services->isNotEmpty())
-                                @foreach($vendor->services as $svc)
-                                    <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;font-size.75rem">
-                                        <span>{{ $svc->name }}</span>
-                                        <span style="font-weight:700">PKR {{ number_format($svc->price) }}</span>
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="hint">No packages defined</div>
-                            @endif
-                            <button type="button" onclick="openPackageModal()" class="btn btn-out btn-xs" style="width:100%;margin-top:1rem">Manage Packages</button>
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
     </form>
 
-    <!-- Package Modal Placeholder -->
-    <div id="packageModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center">
-        <div class="form-card" style="width:450px;margin:0">
-            <div class="form-card-h"><span id="modalTitle">Package</span></div>
-            <form id="packageForm" method="POST">
-                @csrf <div id="methodField"></div>
-                <div class="form-card-b">
-                    <div class="fg"><label>Name</label><input type="text" name="name" id="pkg_name" class="fi" required></div>
-                    <div class="fg-row"><div class="fg"><label>Price</label><input type="number" name="price" id="pkg_price" class="fi" required></div><div class="fg"><label>Unit</label><input type="text" name="price_unit" id="pkg_unit" class="fi" placeholder="e.g. Per Event"></div></div>
-                    <div class="fg"><label>Description</label><textarea name="description" id="pkg_desc" class="fi" rows="3"></textarea></div>
-                </div>
-                <div class="form-card-f" style="padding:1rem;display:flex;justify-content:flex-end;gap:.5rem;background:var(--bg)">
-                    <button type="button" onclick="closePackageModal()" class="btn btn-out">Cancel</button>
-                    <button type="submit" class="btn btn-pri">Save Package</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- JS Handling -->
 @endsection
 
 @section('js')
@@ -298,18 +393,9 @@
             }, 300);
         });
 
-        const modal = document.getElementById('packageModal');
-        const form = document.getElementById('packageForm');
-        function openPackageModal(data = null) {
-            if(data) { /* logic */ } else { form.action = "{{ isset($vendor) ? route('admin.services.store', $vendor) : '' }}"; form.reset(); }
-            modal.style.display = 'flex';
-        }
-        function closePackageModal() { modal.style.display = 'none'; }
-
         function handleGallerySelect(input) {
             const files = Array.from(input.files);
             const grid = document.getElementById('galleryGrid');
-            grid.querySelectorAll('.gallery-new-preview').forEach(el => el.remove());
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = e => {
