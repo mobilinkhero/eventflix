@@ -456,8 +456,7 @@
 
 @section('js')
     <!-- Official Google Maps API -->
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZ7TeNcCz_WfO0uhr1qE9HhjcsrSKbDow&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places"></script>
     <script>
         function previewFile(input, previewId, uploaderId) {
             const file = input.files[0];
