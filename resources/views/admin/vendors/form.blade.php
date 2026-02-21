@@ -469,9 +469,9 @@
 @endsection
 
 @section('js')
-    <!-- Official Google Maps API -->
-    <script async
-        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
+    <!-- Official Google Maps API with Modern Async Loading -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places&loading=async&callback=initAutocomplete"></script>
     
     <script>
         function previewFile(input, previewId, uploaderId) {
