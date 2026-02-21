@@ -21,9 +21,9 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'max:20', 'unique:users'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)],
-            'phone' => ['nullable', 'string', 'max:20'],
             'city_id' => ['nullable', 'exists:cities,id'],
             'account_type' => ['nullable', 'in:user,vendor'],
         ]);
@@ -57,15 +57,17 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'email' => ['required', 'string', 'email'],
+            'login' => ['required', 'string'], // can be email or phone
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $validated['email'])->first();
+        $user = User::where('phone', $validated['login'])
+            ->orWhere('email', $validated['login'])
+            ->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'login' => ['The provided credentials are incorrect.'],
             ]);
         }
 

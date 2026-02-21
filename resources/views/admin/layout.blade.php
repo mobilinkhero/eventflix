@@ -978,6 +978,11 @@
             <a href="{{ route('admin.cities.index') }}" class="{{ request()->routeIs('admin.cities.*') ? 'on' : '' }}">
                 <span class="mi material-icons-round">apartment</span> Cities
             </a>
+            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'on' : '' }}">
+                <span class="mi material-icons-round">people</span> Users
+                @php $userCount = \App\Models\User::count(); @endphp
+                @if($userCount)<span class="cnt">{{ $userCount }}</span>@endif
+            </a>
 
             <div class="sb-label">Other</div>
             <a href="{{ route('home') }}" target="_blank">

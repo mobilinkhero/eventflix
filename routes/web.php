@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\VendorController as AdminVendorController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CityController as AdminCityController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 // Login (no middleware)
 Route::get('/admin/login', [DashboardController::class, 'login'])->name('admin.login');
@@ -82,4 +83,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminAut
     Route::get('/cities/{city}/edit', [AdminCityController::class, 'edit'])->name('cities.edit');
     Route::put('/cities/{city}', [AdminCityController::class, 'update'])->name('cities.update');
     Route::delete('/cities/{city}', [AdminCityController::class, 'destroy'])->name('cities.destroy');
+
+    // Users
+    Route::resource('users', AdminUserController::class);
 });
