@@ -948,9 +948,8 @@
                 grid-template-columns: 1fr
             }
         }
-
-        @yield('css')
     </style>
+    @yield('css')
 </head>
 
 <body>
