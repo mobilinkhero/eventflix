@@ -173,6 +173,39 @@
                     </div>
                 </div>
 
+                <!-- Professional Portfolio -->
+                <div class="form-card">
+                    <div class="form-card-h" style="display:flex;justify-content:space-between;align-items:center">
+                        <div><span class="mi material-icons-round">collections</span> Professional Portfolio</div>
+                        <label class="btn btn-out btn-xs" style="cursor:pointer">
+                            <span class="mi material-icons-round">add_photo_alternate</span> Add Photos
+                            <input type="file" name="gallery_files[]" multiple accept="image/*" style="display:none" 
+                                onchange="handleGallerySelect(this)">
+                        </label>
+                    </div>
+                    <div class="form-card-b">
+                        <div id="galleryGrid" class="gallery-manager-grid">
+                            @if(isset($vendor) && $vendor->gallery)
+                                @foreach($vendor->gallery as $img)
+                                    <div class="gallery-mgr-item">
+                                        <img src="{{ Str::startsWith($img, 'http') ? $img : url('uploads/' . $img) }}">
+                                        <label class="mgr-del">
+                                            <input type="checkbox" name="remove_gallery_images[]" value="{{ $img }}">
+                                            <span class="mi material-icons-round">delete</span>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @endif
+                            <div class="gallery-upload-placeholder" onclick="this.previousElementSibling.previousElementSibling.click()">
+                                <span class="mi material-icons-round">cloud_upload</span>
+                                <span>Drop or Click to add more</span>
+                            </div>
+                        </div>
+                        <div id="newPhotosCount" style="display:none;margin-top:1rem;font-size:0.7rem;color:var(--pri);font-weight:600"></div>
+                        <div class="hint" style="margin-top:1rem">Recommended: High-quality 4K photos (max 4MB per image). These will appear in the app's header gallery.</div>
+                    </div>
+                </div>
+
                 <!-- Contact -->
                 <div class="form-card">
                     <div class="form-card-h"><span class="mi material-icons-round">contact_phone</span> Business Contact
@@ -558,6 +591,95 @@
             gap: .5rem;
         }
 
+        .gallery-manager-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .gallery-mgr-item {
+            aspect-ratio: 4/3;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--brd2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .gallery-mgr-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .gallery-mgr-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .mgr-del {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .mgr-del input {
+            display: none;
+        }
+
+        .mgr-del span {
+            font-size: 1.2rem;
+            color: #444;
+        }
+
+        .mgr-del:has(input:checked) {
+            background: #dc3545;
+        }
+
+        .mgr-del:has(input:checked) span {
+            color: white;
+        }
+
+        .gallery-upload-placeholder {
+            aspect-ratio: 4/3;
+            border: 2px dashed var(--brd2);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--t4);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fbfbfb;
+        }
+
+        .gallery-upload-placeholder:hover {
+            background: #f1f3f5;
+            border-color: var(--pri);
+            color: var(--pri);
+        }
+
+        .gallery-upload-placeholder span:first-child {
+            font-size: 2.5rem;
+        }
+
+        .gallery-upload-placeholder span:last-child {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
         .text-red {
             color: #dc3545 !important;
         }
@@ -611,6 +733,17 @@
                 const delForm = document.getElementById('deletePkgForm');
                 delForm.action = `/admin/services/${id}`;
                 delForm.submit();
+            }
+        }
+
+        function handleGallerySelect(input) {
+            const count = input.files.length;
+            const counter = document.getElementById('newPhotosCount');
+            if (count > 0) {
+                counter.innerText = `+ ${count} new photo(s) selected for upload`;
+                counter.style.display = 'block';
+            } else {
+                counter.style.display = 'none';
             }
         }
     </script>

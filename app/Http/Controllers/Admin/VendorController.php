@@ -61,6 +61,8 @@ class VendorController extends Controller
             'status' => 'required|in:approved,rejected,suspended',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'gallery_files' => 'nullable|array',
+            'gallery_files.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
         $validated['is_verified'] = $request->has('is_verified');
@@ -73,6 +75,14 @@ class VendorController extends Controller
         }
         if ($request->hasFile('cover_file')) {
             $validated['cover_image'] = $request->file('cover_file')->store('vendors/covers', 'public');
+        }
+
+        if ($request->hasFile('gallery_files')) {
+            $gallery = [];
+            foreach ($request->file('gallery_files') as $file) {
+                $gallery[] = $file->store('vendors/gallery', 'public');
+            }
+            $validated['gallery'] = $gallery;
         }
 
         $vendor = Vendor::create($validated);
@@ -115,6 +125,9 @@ class VendorController extends Controller
             'status' => 'required|in:approved,rejected,suspended',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'gallery_files' => 'nullable|array',
+            'gallery_files.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
+            'remove_gallery_images' => 'nullable|array',
         ]);
 
         $validated['is_verified'] = $request->has('is_verified');
@@ -134,6 +147,30 @@ class VendorController extends Controller
             $validated['cover_image'] = $request->file('cover_file')->store('vendors/covers', 'public');
         }
 
+        // Handle Gallery
+        $currentGallery = $vendor->gallery ?? [];
+
+        // Remove selected images
+        if ($request->has('remove_gallery_images')) {
+            foreach ($request->remove_gallery_images as $img) {
+                if (($key = array_search($img, $currentGallery)) !== false) {
+                    if (!filter_var($img, FILTER_VALIDATE_URL)) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($img);
+                    }
+                    unset($currentGallery[$key]);
+                }
+            }
+            $currentGallery = array_values($currentGallery);
+        }
+
+        // Add new images
+        if ($request->hasFile('gallery_files')) {
+            foreach ($request->file('gallery_files') as $file) {
+                $currentGallery[] = $file->store('vendors/gallery', 'public');
+            }
+        }
+        $validated['gallery'] = $currentGallery;
+
         $vendor->update($validated);
         $vendor->categories()->sync($request->categories ?? []);
 
@@ -147,6 +184,13 @@ class VendorController extends Controller
         }
         if ($vendor->cover_image && !filter_var($vendor->cover_image, FILTER_VALIDATE_URL)) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($vendor->cover_image);
+        }
+        if ($vendor->gallery && is_array($vendor->gallery)) {
+            foreach ($vendor->gallery as $img) {
+                if (!filter_var($img, FILTER_VALIDATE_URL)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($img);
+                }
+            }
         }
         $vendor->delete();
         return redirect()->route('admin.vendors.index')->with('success', 'Vendor deleted successfully');
