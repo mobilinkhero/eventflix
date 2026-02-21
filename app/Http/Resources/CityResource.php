@@ -14,7 +14,7 @@ class CityResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'province' => $this->province,
-            'image' => $this->image ? url('uploads/' . $this->image) : null,
+            'image' => $this->image ? (filter_var($this->image, FILTER_VALIDATE_URL) ? $this->image : url('storage/' . $this->image)) : null,
             'vendor_count' => $this->vendors_count ?? ($this->relationLoaded('vendors') ? $this->vendors->count() : 0),
         ];
     }
