@@ -339,14 +339,18 @@
                             <input id="pac-input" class="fi" type="text" placeholder="Search business, city, or street...">
                         </div>
 
-                        <input type="hidden" name="latitude" id="latInput" value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
-                        <input type="hidden" name="longitude" id="lngInput" value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
-                        
+                        <input type="hidden" name="latitude" id="latInput"
+                            value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
+                        <input type="hidden" name="longitude" id="lngInput"
+                            value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+
                         <div id="map"></div>
-                        
+
                         <div class="coord-pill">
-                            <span class="mi material-icons-round" style="font-size:1.1rem;color:var(--pri)">my_location</span>
-                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }}, {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
+                            <span class="mi material-icons-round"
+                                style="font-size:1.1rem;color:var(--pri)">my_location</span>
+                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }},
+                                {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
                         </div>
                     </div>
                 </div>
@@ -441,7 +445,8 @@
 
 @section('js')
     <!-- Official Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_KEY&libraries=places"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZ7TeNcCz_WfO0uhr1qE9HhjcsrSKbDow&libraries=places"></script>
     <script>
         function previewFile(input, previewId, uploaderId) {
             const file = input.files[0];
@@ -467,7 +472,7 @@
                     fullscreenControl: false,
                     streetViewControl: false,
                     styles: [
-                        { featureType: "poi", stylers: [{ visibility: "off" }] } 
+                        { featureType: "poi", stylers: [{ visibility: "off" }] }
                     ]
                 });
 
