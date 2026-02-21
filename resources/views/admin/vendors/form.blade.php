@@ -344,6 +344,17 @@
                         <input type="hidden" name="longitude" id="lngInput"
                             value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
 
+                        <div
+                            style="padding:1rem;background:var(--bg);display:flex;gap:1rem;border-bottom:1px solid var(--brd)">
+                            <div class="fg" style="margin-bottom:0;flex:1">
+                                <label style="font-size:0.65rem;color:var(--t4)">Google Place ID (For Real Reviews)</label>
+                                <input type="text" name="google_place_id" id="placeIdInput" class="fi"
+                                    style="font-family:monospace;font-size:0.75rem"
+                                    value="{{ old('google_place_id', $vendor->google_place_id ?? '') }}"
+                                    placeholder="Select from search results...">
+                            </div>
+                        </div>
+
                         <div id="map"></div>
 
                         <div class="coord-pill">
@@ -510,6 +521,10 @@
 
                     marker.setPosition(place.geometry.location);
                     updateInputs(place.geometry.location.lat(), place.geometry.location.lng());
+
+                    if (place.place_id) {
+                        document.getElementById('placeIdInput').value = place.place_id;
+                    }
                 });
 
                 // Click to Pin
