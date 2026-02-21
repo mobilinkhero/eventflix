@@ -41,6 +41,7 @@ class Vendor extends Model
         'is_active',
         'status',
         'verified_at',
+        'google_place_id',
     ];
 
     protected $casts = [

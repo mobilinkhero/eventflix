@@ -24,6 +24,7 @@ class VendorResource extends JsonResource
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
             ],
+            'google_place_id' => $this->google_place_id,
             'pricing' => [
                 'min' => (float) $this->price_min,
                 'max' => (float) $this->price_max,

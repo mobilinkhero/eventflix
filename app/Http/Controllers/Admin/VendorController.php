@@ -65,6 +65,7 @@ class VendorController extends Controller
             'gallery_files.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'google_place_id' => 'nullable|string|max:255',
         ]);
 
         $validated['is_verified'] = $request->has('is_verified');
@@ -132,6 +133,7 @@ class VendorController extends Controller
             'remove_gallery_images' => 'nullable|array',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'google_place_id' => 'nullable|string|max:255',
         ]);
 
         $validated['is_verified'] = $request->has('is_verified');
