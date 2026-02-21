@@ -2,16 +2,36 @@
 @section('title', isset($vendor) ? 'Edit: ' . $vendor->name : 'New Vendor')
 
 @section('css')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
+        /* Google Map Search Bar Styling */
+        .map-search-wrapper {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: calc(100% - 40px);
+            max-width: 400px;
+        }
+
+        #pac-input {
+            height: 48px !important;
+            padding: 0 16px !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            font-size: 0.95rem !important;
+            transition: 0.3s;
+        }
+
+        #pac-input:focus {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3) !important;
+        }
+
         /* GPS Map Styling */
         #map {
-            height: 450px;
-            border-radius: 12px;
-            border: 1px solid var(--brd);
+            height: 500px;
+            border-radius: 0 0 12px 12px;
             z-index: 1;
-            margin-top: 10px;
         }
 
         /* Premium Header Styling */
@@ -311,22 +331,22 @@
                 <div class="form-card">
                     <div class="form-card-h" style="display:flex;justify-content:space-between;align-items:center">
                         <div><span class="mi material-icons-round">map</span> Global Positioning (GPS)</div>
-                        <div style="font-size:0.7rem;font-weight:400;color:var(--t4)">Search location or click map to pin
-                        </div>
+                        <div style="font-size:0.7rem;font-weight:400;color:var(--t4)">Exact "Google Maps" Location</div>
                     </div>
-                    <div class="form-card-b" style="padding:15px;position:relative">
-                        <input type="hidden" name="latitude" id="latInput"
-                            value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
-                        <input type="hidden" name="longitude" id="lngInput"
-                            value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+                    <div style="position:relative">
+                        <!-- Google Places Search Bar -->
+                        <div class="map-search-wrapper">
+                            <input id="pac-input" class="fi" type="text" placeholder="Search business, city, or street...">
+                        </div>
 
+                        <input type="hidden" name="latitude" id="latInput" value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
+                        <input type="hidden" name="longitude" id="lngInput" value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+                        
                         <div id="map"></div>
-
+                        
                         <div class="coord-pill">
-                            <span class="mi material-icons-round"
-                                style="font-size:1.1rem;color:var(--pri)">my_location</span>
-                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }},
-                                {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
+                            <span class="mi material-icons-round" style="font-size:1.1rem;color:var(--pri)">my_location</span>
+                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }}, {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
                         </div>
                     </div>
                 </div>
@@ -420,8 +440,8 @@
 @endsection
 
 @section('js')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <!-- Official Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_KEY&libraries=places"></script>
     <script>
         function previewFile(input, previewId, uploaderId) {
             const file = input.files[0];
@@ -439,52 +459,66 @@
                 let lat = parseFloat(document.getElementById('latInput').value) || 24.8607;
                 let lng = parseFloat(document.getElementById('lngInput').value) || 67.0011;
 
-                // Initialize Map
-                const map = L.map('map', {
-                    scrollWheelZoom: false
-                }).setView([lat, lng], 14);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(map);
+                // Initialize Google Map
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: lat, lng: lng },
+                    zoom: 15,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                    streetViewControl: false,
+                    styles: [
+                        { featureType: "poi", stylers: [{ visibility: "off" }] } 
+                    ]
+                });
 
                 // Initialize Marker
-                let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                const marker = new google.maps.Marker({
+                    position: { lat: lat, lng: lng },
+                    map: map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
 
-                // Update functionality
-                function up(l, g) {
+                // Initialize Search Control
+                const input = document.getElementById("pac-input");
+                const autocomplete = new google.maps.places.Autocomplete(input);
+                autocomplete.bindTo("bounds", map);
+
+                // Update Coordinates UI
+                function updateInputs(l, g) {
                     document.getElementById('latInput').value = l.toFixed(6);
                     document.getElementById('lngInput').value = g.toFixed(6);
                     document.getElementById('coordDisplay').innerText = l.toFixed(6) + ', ' + g.toFixed(6);
                 }
 
-                // Add Search Control (Free Geocoder)
-                L.Control.geocoder({
-                    defaultMarkGeocode: false,
-                    placeholder: "Search location (e.g. DHA Karachi)...",
-                    position: 'topleft'
-                }).on('markgeocode', function (e) {
-                    const center = e.geocode.center;
-                    marker.setLatLng(center);
-                    map.setView(center, 16);
-                    up(center.lat, center.lng);
-                }).addTo(map);
+                // Autocomplete Event
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (!place.geometry || !place.geometry.location) return;
 
-                // Map Click Event
-                map.on('click', e => {
-                    marker.setLatLng(e.latlng);
-                    up(e.latlng.lat, e.latlng.lng);
+                    if (place.geometry.viewport) {
+                        map.fitBounds(place.geometry.viewport);
+                    } else {
+                        map.setCenter(place.geometry.location);
+                        map.setZoom(17);
+                    }
+
+                    marker.setPosition(place.geometry.location);
+                    updateInputs(place.geometry.location.lat(), place.geometry.location.lng());
                 });
 
-                // Marker Drag Event
-                marker.on('dragend', () => {
-                    const p = marker.getLatLng();
-                    up(p.lat, p.lng);
+                // Click to Pin
+                map.addListener("click", (e) => {
+                    marker.setPosition(e.latLng);
+                    updateInputs(e.latLng.lat(), e.latLng.lng());
                 });
 
-                // Fix map size issues
-                setTimeout(() => map.invalidateSize(), 500);
+                // Drag to Pin
+                marker.addListener("dragend", () => {
+                    const pos = marker.getPosition();
+                    updateInputs(pos.lat(), pos.lng());
+                });
+
             }, 500);
         });
 
