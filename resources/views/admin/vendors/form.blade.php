@@ -3,7 +3,17 @@
 
 @section('css')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
+        /* GPS Map Styling */
+        #map {
+            height: 450px;
+            border-radius: 12px;
+            border: 1px solid var(--brd);
+            z-index: 1;
+            margin-top: 10px;
+        }
+
         /* Premium Header Styling */
         .cover-card {
             position: relative;
@@ -48,7 +58,7 @@
 
         .cover-uploader.has-image .cover-placeholder {
             opacity: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             color: #fff;
             width: 100%;
             height: 100%;
@@ -73,7 +83,7 @@
             border-radius: 20px;
             background: #fff;
             border: 4px solid #fff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -94,7 +104,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             color: #fff;
             opacity: 0;
             transition: 0.3s;
@@ -102,17 +112,33 @@
 
         .profile-uploader:hover .profile-placeholder {
             opacity: 1;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
         }
 
         /* Map Styling */
-        #map { height: 400px; border-radius: 0 0 12px 12px; border-top: 1px solid var(--brd2); z-index: 1; }
-        .coord-pill { 
-            position: absolute; bottom: 20px; left: 20px; z-index: 1000;
-            background: rgba(255,255,255,0.95); padding: 8px 15px; border-radius: 30px;
-            font-size: 0.8rem; font-weight: 700; color: var(--dark);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 1px solid var(--brd);
-            display: flex; align-items: center; gap: 8px;
+        #map {
+            height: 400px;
+            border-radius: 0 0 12px 12px;
+            border-top: 1px solid var(--brd2);
+            z-index: 1;
+        }
+
+        .coord-pill {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--brd);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* Portflio Styling */
@@ -141,7 +167,7 @@
             position: absolute;
             top: 5px;
             right: 5px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -150,14 +176,24 @@
             justify-content: center;
             cursor: pointer;
             color: var(--red);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .gallery-mgr-item.to-delete img { opacity: 0.3; }
+        .gallery-mgr-item.to-delete img {
+            opacity: 0.3;
+        }
+
         .new-tag {
-            position: absolute; top: 10px; left: 10px; background: var(--green);
-            color: white; font-size: 0.6rem; font-weight: 800;
-            padding: 2px 6px; border-radius: 4px; z-index: 2;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--green);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 2;
         }
     </style>
 @endsection
@@ -243,25 +279,30 @@
 
                 <!-- Contact Info -->
                 <div class="form-card">
-                    <div class="form-card-h"><span class="mi material-icons-round">contact_phone</span> Business Contact</div>
+                    <div class="form-card-h"><span class="mi material-icons-round">contact_phone</span> Business Contact
+                    </div>
                     <div class="form-card-b">
                         <div class="fg-row-3">
                             <div class="fg">
                                 <label>Phone</label>
-                                <input type="text" name="phone" class="fi" value="{{ old('phone', $vendor->phone ?? '') }}" placeholder="+92 ...">
+                                <input type="text" name="phone" class="fi" value="{{ old('phone', $vendor->phone ?? '') }}"
+                                    placeholder="+92 ...">
                             </div>
                             <div class="fg">
                                 <label>WhatsApp</label>
-                                <input type="text" name="whatsapp" class="fi" value="{{ old('whatsapp', $vendor->whatsapp ?? '') }}" placeholder="+92 ...">
+                                <input type="text" name="whatsapp" class="fi"
+                                    value="{{ old('whatsapp', $vendor->whatsapp ?? '') }}" placeholder="+92 ...">
                             </div>
                             <div class="fg">
                                 <label>Email</label>
-                                <input type="email" name="email" class="fi" value="{{ old('email', $vendor->email ?? '') }}" placeholder="business@example.com">
+                                <input type="email" name="email" class="fi" value="{{ old('email', $vendor->email ?? '') }}"
+                                    placeholder="business@example.com">
                             </div>
                         </div>
                         <div class="fg">
                             <label>Physical Address / Studio Location</label>
-                            <input type="text" name="address" class="fi" value="{{ old('address', $vendor->address ?? '') }}" placeholder="Street, Phase, City...">
+                            <input type="text" name="address" class="fi"
+                                value="{{ old('address', $vendor->address ?? '') }}" placeholder="Street, Phase, City...">
                         </div>
                     </div>
                 </div>
@@ -270,15 +311,22 @@
                 <div class="form-card">
                     <div class="form-card-h" style="display:flex;justify-content:space-between;align-items:center">
                         <div><span class="mi material-icons-round">map</span> Global Positioning (GPS)</div>
-                        <div style="font-size:0.7rem;font-weight:400;color:var(--t4)">Click map to pin location</div>
+                        <div style="font-size:0.7rem;font-weight:400;color:var(--t4)">Search location or click map to pin
+                        </div>
                     </div>
-                    <div style="position:relative">
-                        <input type="hidden" name="latitude" id="latInput" value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
-                        <input type="hidden" name="longitude" id="lngInput" value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+                    <div class="form-card-b" style="padding:15px;position:relative">
+                        <input type="hidden" name="latitude" id="latInput"
+                            value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
+                        <input type="hidden" name="longitude" id="lngInput"
+                            value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+
                         <div id="map"></div>
+
                         <div class="coord-pill">
-                            <span class="mi material-icons-round" style="font-size:1.1rem;color:var(--pri)">my_location</span>
-                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }}, {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
+                            <span class="mi material-icons-round"
+                                style="font-size:1.1rem;color:var(--pri)">my_location</span>
+                            <span id="coordDisplay">{{ old('latitude', $vendor->latitude ?? '24.8607') }},
+                                {{ old('longitude', $vendor->longitude ?? '67.0011') }}</span>
                         </div>
                     </div>
                 </div>
@@ -289,7 +337,8 @@
                         <div><span class="mi material-icons-round">collections</span> Portfolio Manager</div>
                         <label class="btn btn-out btn-xs" style="cursor:pointer">
                             <span class="mi material-icons-round">add_photo_alternate</span> Add Photos
-                            <input type="file" name="gallery_files[]" id="galleryInput" multiple accept="image/*" style="display:none" onchange="handleGallerySelect(this)">
+                            <input type="file" name="gallery_files[]" id="galleryInput" multiple accept="image/*"
+                                style="display:none" onchange="handleGallerySelect(this)">
                         </label>
                     </div>
                     <div class="form-card-b">
@@ -299,13 +348,16 @@
                                     <div class="gallery-mgr-item">
                                         <img src="{{ Str::startsWith($img, 'http') ? $img : url('uploads/' . $img) }}">
                                         <label class="mgr-del">
-                                            <input type="checkbox" name="remove_gallery_images[]" value="{{ $img }}" onchange="this.closest('.gallery-mgr-item').classList.toggle('to-delete', this.checked)">
+                                            <input type="checkbox" name="remove_gallery_images[]" value="{{ $img }}"
+                                                onchange="this.closest('.gallery-mgr-item').classList.toggle('to-delete', this.checked)">
                                             <span class="mi material-icons-round">delete</span>
                                         </label>
                                     </div>
                                 @endforeach
                             @endif
-                            <div class="gallery-upload-placeholder" style="aspect-ratio:1;border:2px dashed var(--brd);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3);cursor:pointer" onclick="document.getElementById('galleryInput').click()">
+                            <div class="gallery-upload-placeholder"
+                                style="aspect-ratio:1;border:2px dashed var(--brd);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3);cursor:pointer"
+                                onclick="document.getElementById('galleryInput').click()">
                                 <span class="mi material-icons-round" style="font-size:1.5rem">cloud_upload</span>
                                 <span style="font-size:0.6rem;font-weight:600">Add more</span>
                             </div>
@@ -319,14 +371,16 @@
                         <span class="mi material-icons-round">{{ isset($vendor) ? 'check_circle' : 'save' }}</span>
                         {{ isset($vendor) ? 'Save Changes' : 'Create Vendor' }}
                     </button>
-                    <a href="{{ route('admin.vendors.index') }}" class="btn btn-out" style="padding:.75rem 1.5rem;font-size:0.85rem">Cancel</a>
+                    <a href="{{ route('admin.vendors.index') }}" class="btn btn-out"
+                        style="padding:.75rem 1.5rem;font-size:0.85rem">Cancel</a>
                 </div>
             </div>
 
             <!-- Right Sidebar -->
             <div style="width:300px;flex-shrink:0">
                 <div class="form-card">
-                    <div class="form-card-h"><span class="mi material-icons-round">verified_user</span> Status & Security</div>
+                    <div class="form-card-h"><span class="mi material-icons-round">verified_user</span> Status & Security
+                    </div>
                     <div class="form-card-b">
                         <div class="fg">
                             <label>Listing Status</label>
@@ -336,13 +390,17 @@
                                 <option value="suspended" {{ old('status', $vendor->status ?? '') === 'suspended' ? 'selected' : '' }}>🚫 Suspended</option>
                             </select>
                         </div>
-                        <div class="verify-box {{ old('is_verified', $vendor->is_verified ?? false) ? 'verified' : '' }}" style="padding:1rem;background:var(--bg);border-radius:12px;border:1px solid var(--brd)">
+                        <div class="verify-box {{ old('is_verified', $vendor->is_verified ?? false) ? 'verified' : '' }}"
+                            style="padding:1rem;background:var(--bg);border-radius:12px;border:1px solid var(--brd)">
                             <div style="display:flex;align-items:center;justify-content:space-between">
                                 <span style="font-weight:600;font-size:.75rem">Authentic Badge</span>
-                                <label class="tog"><input type="checkbox" name="is_verified" value="1" {{ old('is_verified', $vendor->is_verified ?? false) ? 'checked' : '' }} onchange="this.closest('.verify-box').classList.toggle('verified', this.checked)"><span class="sl"></span></label>
+                                <label class="tog"><input type="checkbox" name="is_verified" value="1" {{ old('is_verified', $vendor->is_verified ?? false) ? 'checked' : '' }}
+                                        onchange="this.closest('.verify-box').classList.toggle('verified', this.checked)"><span
+                                        class="sl"></span></label>
                             </div>
                         </div>
-                        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--brd2);display:flex;flex-direction:column;gap:1rem">
+                        <div
+                            style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--brd2);display:flex;flex-direction:column;gap:1rem">
                             <div style="display:flex;align-items:center;justify-content:space-between">
                                 <span style="font-size:.78rem;font-weight:500">Publicly Visible</span>
                                 <label class="tog"><input type="checkbox" name="is_active" value="1" {{ old('is_active', $vendor->is_active ?? true) ? 'checked' : '' }}><span class="sl"></span></label>
@@ -363,6 +421,7 @@
 
 @section('js')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
         function previewFile(input, previewId, uploaderId) {
             const file = input.files[0];
@@ -375,22 +434,58 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => {
                 let lat = parseFloat(document.getElementById('latInput').value) || 24.8607;
                 let lng = parseFloat(document.getElementById('lngInput').value) || 67.0011;
-                const map = L.map('map', { scrollWheelZoom: false }).setView([lat, lng], 14);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+                // Initialize Map
+                const map = L.map('map', {
+                    scrollWheelZoom: false
+                }).setView([lat, lng], 14);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                // Initialize Marker
                 let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+                // Update functionality
                 function up(l, g) {
                     document.getElementById('latInput').value = l.toFixed(6);
                     document.getElementById('lngInput').value = g.toFixed(6);
                     document.getElementById('coordDisplay').innerText = l.toFixed(6) + ', ' + g.toFixed(6);
                 }
-                map.on('click', e => { marker.setLatLng(e.latlng); up(e.latlng.lat, e.latlng.lng); });
-                marker.on('dragend', () => { const p = marker.getLatLng(); up(p.lat, p.lng); });
+
+                // Add Search Control (Free Geocoder)
+                L.Control.geocoder({
+                    defaultMarkGeocode: false,
+                    placeholder: "Search location (e.g. DHA Karachi)...",
+                    position: 'topleft'
+                }).on('markgeocode', function (e) {
+                    const center = e.geocode.center;
+                    marker.setLatLng(center);
+                    map.setView(center, 16);
+                    up(center.lat, center.lng);
+                }).addTo(map);
+
+                // Map Click Event
+                map.on('click', e => {
+                    marker.setLatLng(e.latlng);
+                    up(e.latlng.lat, e.latlng.lng);
+                });
+
+                // Marker Drag Event
+                marker.on('dragend', () => {
+                    const p = marker.getLatLng();
+                    up(p.lat, p.lng);
+                });
+
+                // Fix map size issues
                 setTimeout(() => map.invalidateSize(), 500);
-            }, 300);
+            }, 500);
         });
 
         function handleGallerySelect(input) {
