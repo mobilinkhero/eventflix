@@ -15,7 +15,7 @@ class CategoryResource extends JsonResource
             'slug' => $this->slug,
             'color' => $this->color,
             'icon' => $this->icon,
-            'image' => $this->image ? (filter_var($this->image, FILTER_VALIDATE_URL) ? $this->image : url('storage/' . $this->image)) : null,
+            'image' => $this->image ? (filter_var($this->image, FILTER_VALIDATE_URL) ? $this->image : url('uploads/' . $this->image)) : null,
             'vendor_count' => $this->vendors_count ?? ($this->relationLoaded('vendors') ? $this->vendors->count() : 0),
         ];
     }
