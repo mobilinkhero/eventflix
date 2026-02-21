@@ -215,6 +215,15 @@
             border-radius: 4px;
             z-index: 2;
         }
+
+        /* Ensure Google suggestions are always on top */
+        .pac-container {
+            z-index: 99999 !important;
+            border-radius: 12px;
+            border: 1px solid var(--brd);
+            margin-top: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
     </style>
 @endsection
 
@@ -465,6 +474,13 @@
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
     <script>     function previewFile(input, previewId, uploaderId) {         const file = input.files[0];         const preview = document.getElementById(previewId);         const uploader = document.getElementById(uploaderId);         if (file) {             const reader = new FileReader();             reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; uploader.classList.add('has-image'); }             reader.readAsDataURL(file);         }     }
          document.addEventListener('DOMContentLoaded', function () {
+            // Check if Google is loaded
+            if (typeof google === 'undefined') {
+                console.error('Google Maps API not loaded. Check your API key and billing.');
+                document.getElementById('pac-input').placeholder = '⚠️ API Error: Check Console';
+                return;
+            }
+
             // Initialize Search Control (No map div needed)
             const input = document.getElementById("pac-input");
             if (input) {
