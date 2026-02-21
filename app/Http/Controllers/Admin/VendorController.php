@@ -63,6 +63,8 @@ class VendorController extends Controller
             'categories.*' => 'exists:categories,id',
             'gallery_files' => 'nullable|array',
             'gallery_files.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $validated['is_verified'] = $request->has('is_verified');
@@ -128,6 +130,8 @@ class VendorController extends Controller
             'gallery_files' => 'nullable|array',
             'gallery_files.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
             'remove_gallery_images' => 'nullable|array',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $validated['is_verified'] = $request->has('is_verified');

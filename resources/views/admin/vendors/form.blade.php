@@ -1,6 +1,20 @@
 @extends('admin.layout')
 @section('title', isset($vendor) ? 'Edit: ' . $vendor->name : 'New Vendor')
 
+@section('css')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 350px; border-radius: 12px; margin-top: 10px; border: 1px solid var(--brd2); z-index: 1; }
+        .map-search-container { position: relative; margin-bottom: 10px; }
+        .coord-pill { 
+            position: absolute; bottom: 10px; left: 10px; z-index: 1000;
+            background: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; color: var(--pri);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+@endsection
+
 @section('content')
     <form method="POST"
         action="{{ isset($vendor) ? route('admin.vendors.update', $vendor) : route('admin.vendors.store') }}"
@@ -241,6 +255,26 @@
                                 <input type="text" name="address" class="fi"
                                     value="{{ old('address', $vendor->address ?? '') }}"
                                     placeholder="Shop #12, Phase 3, ...">
+                            </div>
+                        </div>
+
+                        <!-- Live Map -->
+                        <div class="fg" style="margin-top:1.5rem">
+                            <label style="display:flex;justify-content:space-between;align-items:center">
+                                <span><span class="mi material-icons-round" style="font-size:1rem;vertical-align:middle">location_on</span> Pin Location on Map</span>
+                                <span style="font-size:0.7rem;font-weight:400;color:var(--t4)">Click on map to update coordinates</span>
+                            </label>
+                            
+                            <input type="hidden" name="latitude" id="latInput" value="{{ old('latitude', $vendor->latitude ?? '24.8607') }}">
+                            <input type="hidden" name="longitude" id="lngInput" value="{{ old('longitude', $vendor->longitude ?? '67.0011') }}">
+                            
+                            <div style="position:relative">
+                                <div id="map"></div>
+                                <div class="coord-pill">
+                                    <span id="coordDisplay">
+                                        {{ old('latitude', $vendor->latitude ?? '24.8607') }}, {{ old('longitude', $vendor->longitude ?? '67.0011') }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -696,7 +730,47 @@
         }
     </style>
 
+@section('js')
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial coordinates
+            let initialLat = parseFloat(document.getElementById('latInput').value) || 24.8607;
+            let initialLng = parseFloat(document.getElementById('lngInput').value) || 67.0011;
+
+            // Initialize Map
+            const map = L.map('map').setView([initialLat, initialLng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add Marker
+            let marker = L.marker([initialLat, initialLng], {
+                draggable: true
+            }).addTo(map);
+
+            // Function to update inputs
+            function updateCoords(lat, lng) {
+                document.getElementById('latInput').value = lat.toFixed(6);
+                document.getElementById('lngInput').value = lng.toFixed(6);
+                document.getElementById('coordDisplay').innerText = lat.toFixed(6) + ', ' + lng.toFixed(6);
+            }
+
+            // Map Click Event
+            map.on('click', function(e) {
+                const { lat, lng } = e.latlng;
+                marker.setLatLng([lat, lng]);
+                updateCoords(lat, lng);
+            });
+
+            // Marker Drag Event
+            marker.on('dragend', function(e) {
+                const { lat, lng } = marker.getLatLng();
+                updateCoords(lat, lng);
+            });
+        });
+
         function previewFile(input, previewId, uploaderId) {
             const file = input.files[0];
             const preview = document.getElementById(previewId);
