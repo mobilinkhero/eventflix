@@ -470,39 +470,67 @@
 
 @section('js')
     <!-- Official Google Maps API -->
-    <script
+    <script async
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
-    <script>     function previewFile(input, previewId, uploaderId) {         const file = input.files[0];         const preview = document.getElementById(previewId);         const uploader = document.getElementById(uploaderId);         if (file) {             const reader = new FileReader();             reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; uploader.classList.add('has-image'); }             reader.readAsDataURL(file);         }     }
-         document.addEventListener('DOMContentLoaded', function () {
-            // Check if Google is loaded
-            if (typeof google === 'undefined') {
-                console.error('Google Maps API not loaded. Check your API key and billing.');
-                document.getElementById('pac-input').placeholder = '⚠️ API Error: Check Console';
-                return;
+    
+    <script>
+        function previewFile(input, previewId, uploaderId) {
+            const file = input.files[0];
+            const preview = document.getElementById(previewId);
+            const uploader = document.getElementById(uploaderId);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    uploader.classList.add('has-image');
+                }
+                reader.readAsDataURL(file);
             }
+        }
 
-            // Initialize Search Control (No map div needed)
-            const input = document.getElementById("pac-input");
-            if (input) {
-                const autocomplete = new google.maps.places.Autocomplete(input);
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if Google is loaded
+            window.initAutocomplete = function() {
+                const input = document.getElementById("pac-input");
+                if (input) {
+                    const autocomplete = new google.maps.places.Autocomplete(input);
+                    autocomplete.addListener("place_changed", () => {
+                        const place = autocomplete.getPlace();
+                        if (!place.geometry || !place.geometry.location) return;
 
-                // Autocomplete Event
-                autocomplete.addListener("place_changed", () => {
-                    const place = autocomplete.getPlace();
-                    if (!place.geometry || !place.geometry.location) return;
+                        const lat = place.geometry.location.lat();
+                        const lng = place.geometry.location.lng();
 
-                    const lat = place.geometry.location.lat();
-                    const lng = place.geometry.location.lng();
+                        document.getElementById('latInput').value = lat.toFixed(6);
+                        document.getElementById('lngInput').value = lng.toFixed(6);
+                        
+                        if (place.place_id) {
+                            document.getElementById('placeIdInput').value = place.place_id;
+                        }
+                    });
+                }
+            };
 
-                    document.getElementById('latInput').value = lat.toFixed(6);
-                    document.getElementById('lngInput').value = lng.toFixed(6);
-                    
-                    if (place.place_id) {
-                        document.getElementById('placeIdInput').value = place.place_id;
-                    }
-                });
+            // If google is already loaded, init now, otherwise wait for it
+            if (typeof google !== 'undefined') {
+                initAutocomplete();
             }
         });
-         function handleGallerySelect(input) {         const files = Array.from(input.files);         const grid = document.getElementById('galleryGrid');         files.forEach(file => {             const reader = new FileReader();             reader.onload = e => {                 const div = document.createElement('div');                 div.className = 'gallery-mgr-item gallery-new-preview';                 div.innerHTML = `<img src="${e.target.result}"><div class="new-tag">NEW</div>`;                 grid.insertBefore(div, grid.querySelector('.gallery-upload-placeholder'));             };             reader.readAsDataURL(file);         });     }
+
+        function handleGallerySelect(input) {
+            const files = Array.from(input.files);
+            const grid = document.getElementById('galleryGrid');
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-mgr-item gallery-new-preview';
+                    div.innerHTML = `<img src="${e.target.result}"><div class="new-tag">NEW</div>`;
+                    grid.insertBefore(div, grid.querySelector('.gallery-upload-placeholder'));
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     </script>
 @endsection
