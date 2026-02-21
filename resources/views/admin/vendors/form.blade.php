@@ -456,104 +456,21 @@
 
 @section('js')
     <!-- Official Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places"></script>
-    <script>
-        function previewFile(input, previewId, uploaderId) {
-            const file = input.files[0];
-            const preview = document.getElementById(previewId);
-            const uploader = document.getElementById(uploaderId);
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; uploader.classList.add('has-image'); }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(() => {
-                let lat = parseFloat(document.getElementById('latInput').value) || 24.8607;
-                let lng = parseFloat(document.getElementById('lngInput').value) || 67.0011;
-
-                // Initialize Google Map
-                const map = new google.maps.Map(document.getElementById("map"), {
-                    center: { lat: lat, lng: lng },
-                    zoom: 15,
-                    mapTypeControl: false,
-                    fullscreenControl: false,
-                    streetViewControl: false,
-                    styles: [
-                        { featureType: "poi", stylers: [{ visibility: "off" }] }
-                    ]
-                });
-
-                // Initialize Marker
-                const marker = new google.maps.Marker({
-                    position: { lat: lat, lng: lng },
-                    map: map,
-                    draggable: true,
-                    animation: google.maps.Animation.DROP
-                });
-
-                // Initialize Search Control
-                const input = document.getElementById("pac-input");
-                const autocomplete = new google.maps.places.Autocomplete(input);
-                autocomplete.bindTo("bounds", map);
-
-                // Update Coordinates UI
-                function updateInputs(l, g) {
-                    document.getElementById('latInput').value = l.toFixed(6);
-                    document.getElementById('lngInput').value = g.toFixed(6);
-                    document.getElementById('coordDisplay').innerText = l.toFixed(6) + ', ' + g.toFixed(6);
-                }
-
-                // Autocomplete Event
-                autocomplete.addListener("place_changed", () => {
-                    const place = autocomplete.getPlace();
-                    if (!place.geometry || !place.geometry.location) return;
-
-                    if (place.geometry.viewport) {
-                        map.fitBounds(place.geometry.viewport);
-                    } else {
-                        map.setCenter(place.geometry.location);
-                        map.setZoom(17);
-                    }
-
-                    marker.setPosition(place.geometry.location);
-                    updateInputs(place.geometry.location.lat(), place.geometry.location.lng());
-
-                    if (place.place_id) {
-                        document.getElementById('placeIdInput').value = place.place_id;
-                    }
-                });
-
-                // Click to Pin
-                map.addListener("click", (e) => {
-                    marker.setPosition(e.latLng);
-                    updateInputs(e.latLng.lat(), e.latLng.lng());
-                });
-
-                // Drag to Pin
-                marker.addListener("dragend", () => {
-                    const pos = marker.getPosition();
-                    updateInputs(pos.lat(), pos.lng());
-                });
-
-            }, 500);
-        });
-
-        function handleGallerySelect(input) {
-            const files = Array.from(input.files);
-            const grid = document.getElementById('galleryGrid');
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const div = document.createElement('div');
-                    div.className = 'gallery-mgr-item gallery-new-preview';
-                    div.innerHTML = `<img src="${e.target.result}"><div class="new-tag">NEW</div>`;
-                    grid.insertBefore(div, grid.querySelector('.gallery-upload-placeholder'));
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
+    <script>     function previewFile(input, previewId, uploaderId) {         const file = input.files[0];         const preview = document.getElementById(previewId);         const uploader = document.getElementById(uploaderId);         if (file) {             const reader = new FileReader();             reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; uploader.classList.add('has-image'); }             reader.readAsDataURL(file);         }     }
+         document.addEventListener('DOMContentLoaded', function () {         setTimeout(() => {             let lat = parseFloat(document.getElementById('latInput').value) || 24.8607;             let lng = parseFloat(document.getElementById('lngInput').value) || 67.0011;
+                 // Initialize Google Map             const map = new google.maps.Map(document.getElementById("map"), {                 center: { lat: lat, lng: lng },                 zoom: 15,                 mapTypeControl: false,                 fullscreenControl: false,                 streetViewControl: false,                 styles: [                     { featureType: "poi", stylers: [{ visibility: "off" }] }                 ]             });
+                 // Initialize Marker             const marker = new google.maps.Marker({                 position: { lat: lat, lng: lng },                 map: map,                 draggable: true,                 animation: google.maps.Animation.DROP             });
+                 // Initialize Search Control             const input = document.getElementById("pac-input");             const autocomplete = new google.maps.places.Autocomplete(input);             autocomplete.bindTo("bounds", map);
+                 // Update Coordinates UI             function updateInputs(l, g) {                 document.getElementById('latInput').value = l.toFixed(6);                 document.getElementById('lngInput').value = g.toFixed(6);                 document.getElementById('coordDisplay').innerText = l.toFixed(6) + ', ' + g.toFixed(6);             }
+                 // Autocomplete Event             autocomplete.addListener("place_changed", () => {                 const place = autocomplete.getPlace();                 if (!place.geometry || !place.geometry.location) return;
+                     if (place.geometry.viewport) {                     map.fitBounds(place.geometry.viewport);                 } else {                     map.setCenter(place.geometry.location);                     map.setZoom(17);                 }
+                     marker.setPosition(place.geometry.location);                 updateInputs(place.geometry.location.lat(), place.geometry.location.lng());
+                     if (place.place_id) {                     document.getElementById('placeIdInput').value = place.place_id;                 }             });
+                 // Click to Pin             map.addListener("click", (e) => {                 marker.setPosition(e.latLng);                 updateInputs(e.latLng.lat(), e.latLng.lng());             });
+                 // Drag to Pin             marker.addListener("dragend", () => {                 const pos = marker.getPosition();                 updateInputs(pos.lat(), pos.lng());             });
+             }, 500);     });
+         function handleGallerySelect(input) {         const files = Array.from(input.files);         const grid = document.getElementById('galleryGrid');         files.forEach(file => {             const reader = new FileReader();             reader.onload = e => {                 const div = document.createElement('div');                 div.className = 'gallery-mgr-item gallery-new-preview';                 div.innerHTML = `<img src="${e.target.result}"><div class="new-tag">NEW</div>`;                 grid.insertBefore(div, grid.querySelector('.gallery-upload-placeholder'));             };             reader.readAsDataURL(file);         });     }
     </script>
 @endsection
